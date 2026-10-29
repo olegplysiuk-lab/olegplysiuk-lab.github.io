@@ -214,6 +214,7 @@ button { font: inherit; color: inherit; }
 .links { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .links a { display: inline-block; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg); text-decoration: none; }
 .links a:hover { border-color: var(--accent); color: var(--accent); }
+.links a[download] { border-color: var(--accent); color: var(--accent); }
 .note { max-width: 60ch; margin: 0; font: 400 13px/1.6 var(--mono); color: var(--muted); }
 .nogl-msg { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 0 var(--gr) 0 var(--gl); text-align: center; color: var(--muted); font: 400 14px/1.6 var(--mono); }
 
@@ -225,6 +226,12 @@ button { font: inherit; color: inherit; }
 .cursor.is-off { opacity: 0; }
 @media (hover: hover) and (pointer: fine) { .track { cursor: none; } }
 @media (hover: none), (pointer: coarse) { .cursor { display: none; } }
+/* Touch screens: the 3D view takes sideways swipes (vertical drags still scroll the page) */
+@media (pointer: coarse) { #stage { touch-action: pan-y; } }
+.swipe-hint { position: fixed; z-index: 6; left: 50%; bottom: calc(var(--bottom) + 46px); transform: translateX(-50%); display: flex; gap: 10px; align-items: center; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font: 500 10px/1 var(--mono); letter-spacing: 0.18em; text-transform: uppercase; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.4s; }
+.swipe-hint i { font-style: normal; color: var(--accent); animation: nudge 1.6s ease-in-out infinite; }
+.swipe-hint i:first-child { animation-direction: reverse; }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-5px); } }
 
 /* Lightbox */
 .lb { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; gap: 14px; align-content: center; padding: var(--top) var(--gr) var(--bottom) var(--gl); background: rgb(4 10 11 / 0.94); }
@@ -263,7 +270,7 @@ button { font: inherit; color: inherit; }
 }
 @media (prefers-reduced-motion: reduce) {
   .welcome__ch { transition: opacity 0.6s; transform: none; filter: none; }
-  .hud .dot, .sound__bars i, .marquee { animation: none; }
+  .hud .dot, .sound__bars i, .marquee, .swipe-hint i { animation: none; }
 }
 </style>
 </head>
@@ -271,6 +278,7 @@ button { font: inherit; color: inherit; }
 <canvas id="stage" aria-hidden="true"></canvas>
 <div class="vids" aria-hidden="true"></div>
 <div class="labels" aria-hidden="true"></div>
+<div class="swipe-hint" aria-hidden="true"><i>←</i>Swipe<i>→</i></div>
 
 <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
 <span class="corner corner--bl"></span><span class="corner corner--br"></span>
@@ -350,8 +358,8 @@ button { font: inherit; color: inherit; }
         <p class="about__bio">I help companies show their products and tell their story: ads and brand films, product scenes, AI characters who talk on screen, and reels for every platform. One person for the whole road, from the first idea and script to the final edit and sound. Tell me about your product, and let’s make something people actually want to watch.</p>
         <dl class="about__facts">
           <div><dt>Experience</dt><dd>Feb 2026 – now · In-house video creator, premium office-chair brand<br>2024 – 2025 · Videographer and photographer, W&amp;A Detailing<br>2023 · Freelance videographer and editor</dd></div>
-          <div><dt>Tools</dt><dd>DaVinci Resolve Studio, After Effects, Photoshop, Lightroom<br>Kling, Google Flow, WaveSpeed, ElevenLabs, Suno, ChatGPT, and more: the list keeps growing</dd></div>
-          <div><dt>Formats</dt><dd>16:9 · 9:16 · 1:1, for websites, YouTube, Reels and TikTok</dd></div>
+          <div><dt>Tools</dt><dd>DaVinci Resolve Studio, After Effects, Photoshop, Lightroom<br>Kling, Seedance 2.5, Veo 3, Google Flow, WaveSpeed, ElevenLabs, Suno, ChatGPT, and more: the list keeps growing</dd></div>
+          <div><dt>Formats</dt><dd>16:9 · 9:16 · 1:1 and other formats, for websites, YouTube, Reels, TikTok and more</dd></div>
           <div><dt>Languages</dt><dd>Ukrainian (native), Polish (conversational), English (B1)</dd></div>
           <div><dt>Based in</dt><dd>Warsaw, Poland</dd></div>
         </dl>
@@ -364,6 +372,7 @@ button { font: inherit; color: inherit; }
         <span class="mail">olegplysiuk@gmail.com</span>
       </div>
       <ul class="links">
+        <li><a href="cv/Oleh_Plysiuk_CV.pdf" download>Download CV ↓</a></li>
         <li><a href="https://www.behance.net/fc6d06c6" target="_blank" rel="noopener">Behance ↗</a></li>
       </ul>
       <p class="note">Music: “Begonia”</p>
@@ -579,8 +588,20 @@ function createSound(ctx, out) {
     if (CAPTURE) { soundLog.push([captureMs / 1000, type, a, b]); return; }
     if (engine && soundOn) engine[type](audio.currentTime, a, b);
   };
+  // iPhone: Web Audio follows the ringer (silent) switch unless the page plays media. Ask Safari for a "playback"
+  // session (16.4+); on older iOS a silent looping media element does the same job.
+  let silentEl = null;
+  function unmuteIOS() {
+    try { if (navigator.audioSession) { navigator.audioSession.type = 'playback'; return; } } catch (e) {}
+    if (silentEl || !/iP(hone|ad|od)|Macintosh/.test(navigator.userAgent) || !('ontouchend' in document)) return;
+    silentEl = document.createElement('audio');
+    silentEl.src = 'media/silent.mp3'; silentEl.loop = true;
+    silentEl.setAttribute('playsinline', ''); silentEl.setAttribute('x-webkit-airplay', 'deny');
+    silentEl.play().catch(() => {});
+  }
   function startSound() {
     if (CAPTURE) { snd('start'); return; }
+    unmuteIOS();
     try {
       if (!audio) { audio = new (window.AudioContext || window.webkitAudioContext)(); engine = createSound(audio, audio.destination); }
       audio.resume();
@@ -596,7 +617,11 @@ function createSound(ctx, out) {
     if (engine && audio) engine.on(audio.currentTime, on);
   }
   soundBtn.addEventListener('click', () => { setSound(!soundOn); if (soundOn && diveAt !== null) introAudio(false); });
-  if (!CAPTURE) window.addEventListener('pointerdown', () => snd('click'), { passive: true });
+  if (!CAPTURE) window.addEventListener('pointerdown', () => {
+    // a phone can suspend audio (a call, another app); any touch while sound is on brings it back
+    if (audio && soundOn && audio.state !== 'running') { unmuteIOS(); audio.resume(); }
+    snd('click');
+  }, { passive: true });
 
   // The welcome line (with its echo) plays as you dive in. As "world" ends the soundtrack comes in on the quiet break
   // just before its first drop (0:38 in the song), timed so the drop lands on the third echo of "world"; it then loops
@@ -723,6 +748,7 @@ function createSound(ctx, out) {
   const contact = document.querySelector('.contact');
   const heroEl = document.querySelector('.hero');
   const holdEl = document.querySelector('.hold');
+  const swipeHint = document.querySelector('.swipe-hint');
   const finder = document.querySelector('.finder');
   const pill = document.querySelector('.pill');
   const rulerEl = document.querySelector('.ruler');
@@ -1743,6 +1769,54 @@ function createSound(ctx, out) {
     const top = target === 'contact' ? contact.offsetTop : scrollForKf(+target);
     window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
   }
+  // Touch: drag sideways to move through the work like a carousel (the view follows the finger, a flick goes to the
+  // next card), and after a vertical scroll the page settles on the nearest card
+  const touchUI = !CAPTURE && matchMedia('(pointer: coarse)').matches;
+  const stepPx = () => (track.offsetHeight - innerHeight) / (segs - 1);
+  let drag = null, dragEndedAt = 0, swiped = false, settleTimer = 0;
+  function settle() {
+    if (!touchUI || drag || !lb.hidden || gatePhase !== 'gone') return;
+    const k = window.scrollY / stepPx();
+    if (k > segs - 1.5) return; // past the last reel: let the page run freely into the contact section
+    const top = Math.round(k) * stepPx();
+    if (Math.abs(window.scrollY - top) > 3) window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  if (touchUI) {
+    if ('onscrollend' in window) window.addEventListener('scrollend', settle);
+    else window.addEventListener('scroll', () => { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 160); }, { passive: true });
+    canvas.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch' || gatePhase !== 'gone' || !lb.hidden) return;
+      const now = performance.now();
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, sy: window.scrollY, horiz: null, lx: e.clientX, lt: now, v: 0 };
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (drag.horiz === null && Math.hypot(dx, dy) > 8) drag.horiz = Math.abs(dx) > Math.abs(dy);
+      if (!drag.horiz) return;
+      holding = false;
+      const now = performance.now();
+      drag.v = (e.clientX - drag.lx) / Math.max(1, now - drag.lt); drag.lx = e.clientX; drag.lt = now;
+      // about half a screen width of drag moves one card; dragging left goes forward
+      const top = Math.min(Math.max(drag.sy - (dx / (innerWidth * 0.55)) * stepPx(), 0), (segs - 1) * stepPx());
+      window.scrollTo(0, top);
+    }, { passive: true });
+    const endDrag = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = drag; drag = null;
+      if (!d.horiz) return;
+      dragEndedAt = performance.now(); swiped = true;
+      const from = Math.round(d.sy / stepPx()), at = window.scrollY / stepPx();
+      let k = Math.round(at);
+      if (Math.abs(d.v) > 0.3 && k === from) k = from + (d.v < 0 ? 1 : -1); // a flick always moves at least one card
+      k = Math.min(Math.max(k, 0), segs - 1);
+      window.scrollTo({ top: k * stepPx(), behavior: reduce ? 'auto' : 'smooth' });
+    };
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+    document.getElementById('hold').textContent = 'Touch and hold';
+  }
+
   const finderToggle = document.querySelector('.finder__toggle');
   function toggleFinder(open) {
     finder.classList.toggle('open', open);
@@ -1825,7 +1899,7 @@ function createSound(ctx, out) {
     document.getElementById('hold').addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && canHold()) { holding = true; e.preventDefault(); } });
     document.getElementById('hold').addEventListener('keyup', endHold);
     canvas.addEventListener('click', (e) => {
-      if (gatePhase !== 'gone') return;
+      if (gatePhase !== 'gone' || performance.now() - dragEndedAt < 350) return;
       pointer(e.clientX, e.clientY);
       splash(e.clientX, e.clientY);
       raycaster.setFromCamera(ndc, camera);
@@ -2283,6 +2357,7 @@ function createSound(ctx, out) {
     if (live && introE > 0.12 && !welcomeEl.classList.contains('is-on')) welcomeEl.classList.add('is-on');
     welcomeEl.style.opacity = heroAmt.toFixed(3);
     holdEl.style.opacity = live ? (heroAmt * introE * (holdDone ? 0 : 1)).toFixed(3) : 0;
+    swipeHint.style.opacity = touchUI && live && !swiped ? (smooth(1.5, 1.9, u) * (1 - smooth(segs - 1.4, segs - 1, u))).toFixed(3) : 0;
     holdEl.style.pointerEvents = heroAmt > 0.5 && !holdDone ? 'auto' : 'none';
     finder.style.opacity = live ? smooth(1.65, 2.0, u).toFixed(3) : 0;
     finder.style.pointerEvents = u > 1.7 ? 'auto' : 'none';
