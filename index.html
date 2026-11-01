@@ -226,8 +226,6 @@ button { font: inherit; color: inherit; }
 .cursor.is-off { opacity: 0; }
 @media (hover: hover) and (pointer: fine) { .track { cursor: none; } }
 @media (hover: none), (pointer: coarse) { .cursor { display: none; } }
-/* Touch screens: the 3D view takes sideways swipes (vertical drags still scroll the page) */
-@media (pointer: coarse) { #stage { touch-action: pan-y; } }
 .swipe-hint { position: fixed; z-index: 6; left: 50%; bottom: calc(var(--bottom) + 46px); transform: translateX(-50%); display: flex; gap: 10px; align-items: center; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font: 500 10px/1 var(--mono); letter-spacing: 0.18em; text-transform: uppercase; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.4s; }
 .swipe-hint i { font-style: normal; color: var(--accent); animation: nudge 1.6s ease-in-out infinite; }
 .swipe-hint i:first-child { animation-direction: reverse; }
@@ -235,7 +233,7 @@ button { font: inherit; color: inherit; }
 
 /* Lightbox */
 .lb { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; gap: 14px; align-content: center; padding: var(--top) var(--gr) var(--bottom) var(--gl); background: rgb(4 10 11 / 0.94); }
-.lb video { max-width: min(100%, 1400px); max-height: 82vh; border-radius: 14px; background: #000; }
+.lb video { max-width: min(100%, 1400px); max-height: 82vh; max-height: 76svh; border-radius: 14px; background: #000; }
 .lb__yt { width: min(100%, 1400px); max-height: 82vh; aspect-ratio: 16 / 9; }
 .lb__yt.is-tall { width: auto; height: 82vh; max-width: 100%; }
 .lb__yt iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 14px; background: #000; }
@@ -246,10 +244,22 @@ button { font: inherit; color: inherit; }
 .lb p { max-width: 56ch; margin: 0; text-align: center; font: 400 13px/1.5 var(--mono); color: var(--muted); }
 .lb button, .lb__link { padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; background: transparent; cursor: pointer; color: var(--fg); text-decoration: none; font: 500 12px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
 .lb__link { border-color: var(--accent); color: var(--accent); }
+.lb .lb__x { position: fixed; top: var(--top); right: var(--gr); display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; background: rgb(6 17 19 / 0.6); font: 400 17px/1 var(--body); letter-spacing: 0; }
+html.lb-open, html.lb-open body { overflow: hidden; }
+/* Touch: a Play badge on the card in front */
+.tap-play { position: fixed; left: 0; top: 0; z-index: 4; display: flex; gap: 8px; align-items: center; padding: 10px 16px 10px 13px; border: 1px solid rgb(238 244 242 / 0.4); border-radius: 999px; background: rgb(6 17 19 / 0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font: 500 11px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+.tap-play svg { width: 11px; height: 11px; fill: var(--accent); }
 
 .fade { transition: opacity 0.4s; }
 @media (max-width: 760px) {
-  .finder, .ruler__label, .palette__label, .hud--tr br, .hud--tr #depth { display: none; }
+  .ruler__label, .palette__label, .hud--tr br, .hud--tr #depth { display: none; }
+  /* phones: the finder opens as a list under the top pill, from its Work button */
+  .finder { left: 50%; bottom: auto; top: calc(var(--top) + 78px); transform: translateX(-50%); }
+  .finder__toggle { display: none; }
+  .finder ul { position: static; min-width: 240px; gap: 0; padding: 6px 8px; transform: translateY(-8px); }
+  .finder li button { display: block; width: 100%; padding: 11px 10px; font-size: 12px; }
+  .pill button { white-space: nowrap; }
+  .pill [data-go="2"]::after { content: " ▾"; color: var(--accent); }
   .hud { font-size: 10px; }
   .pill { top: calc(var(--top) + 30px); }
   .label { max-width: 70vw; }
@@ -263,6 +273,20 @@ button { font: inherit; color: inherit; }
   .about { grid-template-columns: minmax(0, 1fr); }
   .about__photo { max-width: 420px; }
   .about__facts div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+/* Touch screens: the 3D view takes every swipe itself (one swipe, one card), the page never pulls to refresh,
+   and the buttons are big enough for a thumb */
+@media (pointer: coarse) {
+  html { overscroll-behavior-y: none; }
+  #stage { touch-action: none; }
+  .lb { touch-action: none; }
+  .swipe-hint { bottom: calc(var(--bottom) + 96px); }
+  .hold__btn { padding: 12px 0; }
+  .pill { padding: 0 14px; }
+  .pill button { padding: 12px 6px; }
+  .sound { min-height: 40px; }
+  .palette__row { gap: 9px; padding: 8px; }
+  .sw { width: 24px; height: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .about__photo img { transform: none; filter: none; transition: none; }
@@ -279,6 +303,7 @@ button { font: inherit; color: inherit; }
 <div class="vids" aria-hidden="true"></div>
 <div class="labels" aria-hidden="true"></div>
 <div class="swipe-hint" aria-hidden="true"><i>←</i>Swipe<i>→</i></div>
+<div class="tap-play" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2 1l9 5-9 5z"/></svg>Play</div>
 
 <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
 <span class="corner corner--bl"></span><span class="corner corner--br"></span>
@@ -395,6 +420,7 @@ button { font: inherit; color: inherit; }
 </div>
 
 <div class="lb" hidden role="dialog" aria-modal="true" aria-label="Video">
+  <button type="button" class="lb__x" id="lb-x" aria-label="Close video">✕</button>
   <video controls playsinline preload="auto"></video>
   <div class="lb__yt" hidden></div>
   <div class="lb__soon" hidden>
@@ -749,7 +775,11 @@ function createSound(ctx, out) {
   const contact = document.querySelector('.contact');
   const heroEl = document.querySelector('.hero');
   const holdEl = document.querySelector('.hold');
+  holdEl.style.pointerEvents = 'none';
   const swipeHint = document.querySelector('.swipe-hint');
+  const tapPlay = document.querySelector('.tap-play');
+  const holdBtn = document.getElementById('hold');
+  let tapPlayAmt = 0;
   const finder = document.querySelector('.finder');
   const pill = document.querySelector('.pill');
   const rulerEl = document.querySelector('.ruler');
@@ -1759,59 +1789,89 @@ function createSound(ctx, out) {
   }
 
   // ---------- Scroll → camera and creature ----------
+  const touchUI = !CAPTURE && matchMedia('(pointer: coarse)').matches;
   function scrollU() {
     const max = track.offsetHeight - innerHeight;
     const s = clamp01(window.scrollY / Math.max(max, 1)) * (segs - 1);
     const k = Math.min(Math.floor(s), segs - 2);
-    return 1 + k + (reduce ? s - k : easeIO(clamp01(s - k)));
+    // a scroll wheel lingers on each card; on touch the view follows the finger evenly (the glide does the easing)
+    return 1 + k + (reduce || touchUI ? s - k : easeIO(clamp01(s - k)));
   }
   const scrollForKf = (k) => ((k - 1) / (segs - 1)) * (track.offsetHeight - innerHeight);
   function goTo(target) {
     const top = target === 'contact' ? contact.offsetTop : scrollForKf(+target);
-    window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+    if (touchUI) glideTo(top);
+    else window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
   }
-  // Touch: drag sideways to move through the work like a carousel (the view follows the finger, a flick goes to the
-  // next card), and after a vertical scroll the page settles on the nearest card
-  const touchUI = !CAPTURE && matchMedia('(pointer: coarse)').matches;
+  // Touch: the work is a carousel. Every swipe, sideways or up and down, moves one card (left or up goes forward);
+  // the view follows the finger, a short swipe or a flick is enough, and past the last reel it carries on to About
   const stepPx = () => (track.offsetHeight - innerHeight) / (segs - 1);
-  let drag = null, dragEndedAt = 0, swiped = false, settleTimer = 0;
+  const swipePx = () => Math.min(Math.max(Math.min(innerWidth, innerHeight) * 0.55, 170), 320);
+  const LAST = segs - 2; // the last reel, counted in cards from the hero
+  let drag = null, dragEndedAt = 0, swiped = false, settleTimer = 0, glide = null;
+  function glideTo(top) {
+    const from = window.scrollY, dist = top - from;
+    glide = Math.abs(dist) < 1 || reduce ? null : { from, dist, top, t0: performance.now(), ms: Math.min(950, 380 + (Math.abs(dist) / stepPx()) * 170) };
+    if (!glide) window.scrollTo(0, top);
+  }
+  function tickGlide(now) {
+    if (!glide) return;
+    const p = clamp01((now - glide.t0) / glide.ms);
+    window.scrollTo(0, glide.from + glide.dist * (1 - Math.pow(1 - p, 3)));
+    if (p >= 1) glide = null;
+  }
   function settle() {
-    if (!touchUI || drag || !lb.hidden || gatePhase !== 'gone') return;
+    if (!touchUI || drag || glide || !lb.hidden || gatePhase !== 'gone') return;
     const k = window.scrollY / stepPx();
-    if (k > segs - 1.5) return; // past the last reel: let the page run freely into the contact section
+    if (k > LAST + 0.5) return; // past the last reel: the page runs freely through About and contact
     const top = Math.round(k) * stepPx();
-    if (Math.abs(window.scrollY - top) > 3) window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+    if (Math.abs(window.scrollY - top) > 3) glideTo(top);
   }
   if (touchUI) {
     if ('onscrollend' in window) window.addEventListener('scrollend', settle);
     else window.addEventListener('scroll', () => { clearTimeout(settleTimer); settleTimer = setTimeout(settle, 160); }, { passive: true });
-    canvas.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'touch' || gatePhase !== 'gone' || !lb.hidden) return;
+    window.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch' || drag || gatePhase !== 'gone' || !lb.hidden) return;
+      if (e.target !== canvas && e.target.id !== 'hold') return;
       const now = performance.now();
-      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, sy: window.scrollY, horiz: null, lx: e.clientX, lt: now, v: 0 };
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, at: window.scrollY / stepPx(), axis: null, resume: glide ? glide.top : null, pts: [[e.clientX, e.clientY, now]] };
+      glide = null;
     });
     window.addEventListener('pointermove', (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-      if (drag.horiz === null && Math.hypot(dx, dy) > 8) drag.horiz = Math.abs(dx) > Math.abs(dy);
-      if (!drag.horiz) return;
-      holding = false;
+      if (!drag.axis) {
+        if (Math.hypot(dx, dy) < 7) return;
+        drag.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+        holding = false;
+      }
       const now = performance.now();
-      drag.v = (e.clientX - drag.lx) / Math.max(1, now - drag.lt); drag.lx = e.clientX; drag.lt = now;
-      // about half a screen width of drag moves one card; dragging left goes forward
-      const top = Math.min(Math.max(drag.sy - (dx / (innerWidth * 0.55)) * stepPx(), 0), (segs - 1) * stepPx());
-      window.scrollTo(0, top);
+      drag.pts.push([e.clientX, e.clientY, now]);
+      while (drag.pts.length > 2 && now - drag.pts[0][2] > 110) drag.pts.shift();
+      const k = drag.at - (drag.axis === 'x' ? dx : dy) / swipePx();
+      window.scrollTo(0, Math.min(Math.max(k, 0), contact.offsetTop / stepPx()) * stepPx());
     }, { passive: true });
     const endDrag = (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       const d = drag; drag = null;
-      if (!d.horiz) return;
+      if (!d.axis) {
+        // a tap while the view was still gliding finishes the glide and does not count as a tap on a card
+        if (d.resume !== null) { dragEndedAt = performance.now(); glideTo(d.resume); }
+        return;
+      }
       dragEndedAt = performance.now(); swiped = true;
-      const from = Math.round(d.sy / stepPx()), at = window.scrollY / stepPx();
-      let k = Math.round(at);
-      if (Math.abs(d.v) > 0.3 && k === from) k = from + (d.v < 0 ? 1 : -1); // a flick always moves at least one card
-      k = Math.min(Math.max(k, 0), segs - 1);
-      window.scrollTo({ top: k * stepPx(), behavior: reduce ? 'auto' : 'smooth' });
+      const a = d.pts[0], b = d.pts[d.pts.length - 1], i = d.axis === 'x' ? 0 : 1;
+      const v = (b[i] - a[i]) / Math.max(16, b[2] - a[2]); // px per ms; towards the right or down goes back
+      const at = window.scrollY / stepPx(), moved = at - d.at, from = Math.round(d.at);
+      const dir = Math.abs(v) > 0.25 ? (v < 0 ? 1 : -1) : Math.abs(moved) > 0.12 ? Math.sign(moved) : 0;
+      let k;
+      if (d.at > LAST + 0.02) k = dir > 0 ? LAST + 1 : dir < 0 ? LAST : at > LAST + 0.5 ? LAST + 1 : LAST; // between the last reel and About
+      else {
+        k = Math.round(at);
+        if (k === from && dir) k = from + dir;
+        else if (dir && Math.sign(k - from) === -dir) k = from;
+      }
+      glideTo(k > LAST ? contact.offsetTop : Math.max(0, k) * stepPx());
     };
     window.addEventListener('pointerup', endDrag);
     window.addEventListener('pointercancel', endDrag);
@@ -1819,16 +1879,26 @@ function createSound(ctx, out) {
   }
 
   const finderToggle = document.querySelector('.finder__toggle');
+  const pillWork = pill.querySelector('[data-go="2"]');
+  const narrow = matchMedia('(max-width: 760px)');
   function toggleFinder(open) {
     finder.classList.toggle('open', open);
     finderToggle.setAttribute('aria-expanded', String(open));
+    if (narrow.matches) pillWork.setAttribute('aria-expanded', String(open)); else pillWork.removeAttribute('aria-expanded');
   }
   finderToggle.addEventListener('click', () => toggleFinder(!finder.classList.contains('open')));
   finderToggle.addEventListener('pointerenter', () => snd('tick', 1));
   document.querySelectorAll('[data-go]').forEach((b) => {
-    b.addEventListener('click', () => { toggleFinder(false); goTo(b.dataset.go); });
+    b.addEventListener('click', () => {
+      // on phones, Work in the top pill opens the list of films instead of jumping straight to the first one
+      if (b === pillWork && narrow.matches) { toggleFinder(!finder.classList.contains('open')); return; }
+      toggleFinder(false); goTo(b.dataset.go);
+    });
     b.addEventListener('pointerenter', () => snd('tick', 1));
   });
+  // a tap outside the open list only closes it
+  let finderClosedAt = 0;
+  window.addEventListener('pointerdown', (e) => { if (finder.classList.contains('open') && !e.target.closest('.finder, .pill')) { toggleFinder(false); finderClosedAt = performance.now(); } });
 
   const look = new THREE.Vector3(), crePos = new THREE.Vector3();
   const cyl = (A, B, f) => polar(lerp(A[0], B[0], f), lerp(A[1], B[1], f), lerp(A[2], B[2], f));
@@ -1890,7 +1960,8 @@ function createSound(ctx, out) {
   const raycaster = new THREE.Raycaster();
   const canHold = () => gatePhase === 'gone' && u < 1.35 && !holdDone;
   if (!CAPTURE) {
-    window.addEventListener('pointermove', (e) => pointer(e.clientX, e.clientY), { passive: true });
+    // a finger is not a cursor: on touch the camera and the cards do not lean towards where it last was
+    window.addEventListener('pointermove', (e) => { if (e.pointerType !== 'touch') pointer(e.clientX, e.clientY); }, { passive: true });
     const startHold = (e) => { if (canHold()) { holding = true; e.preventDefault(); } };
     const endHold = () => { holding = false; };
     canvas.addEventListener('pointerdown', startHold);
@@ -1900,12 +1971,16 @@ function createSound(ctx, out) {
     document.getElementById('hold').addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && canHold()) { holding = true; e.preventDefault(); } });
     document.getElementById('hold').addEventListener('keyup', endHold);
     canvas.addEventListener('click', (e) => {
-      if (gatePhase !== 'gone' || performance.now() - dragEndedAt < 350) return;
-      pointer(e.clientX, e.clientY);
+      if (gatePhase !== 'gone' || performance.now() - Math.max(dragEndedAt, finderClosedAt) < 350) return;
+      if (!touchUI) pointer(e.clientX, e.clientY);
       splash(e.clientX, e.clientY);
-      raycaster.setFromCamera(ndc, camera);
+      raycaster.setFromCamera({ x: (e.clientX / innerWidth) * 2 - 1, y: -(e.clientY / innerHeight) * 2 + 1 }, camera);
       const hit = raycaster.intersectObjects(panels.filter((p) => p.tab.visible).map((x) => x.mesh))[0];
-      if (hit) openLightbox(hit.object.userData.index);
+      if (!hit) return;
+      const i = hit.object.userData.index;
+      // on touch a card at the side comes to the front first; the one in front plays
+      if (touchUI && Math.abs(u - panels[i].s.kf) > 0.4) glideTo((panels[i].s.kf - 1) * stepPx());
+      else openLightbox(i);
     });
   }
 
@@ -1964,13 +2039,34 @@ function createSound(ctx, out) {
     lbLink.hidden = !s.yt;
     if (s.yt) lbLink.href = `https://youtu.be/${s.yt}`;
     lb.hidden = false;
+    document.documentElement.classList.add('lb-open'); // the page underneath stays put while the film is open
+    if (useHistory && !lbHist) { try { history.pushState({ lb: 1 }, ''); lbHist = true; } catch (e) { /* history not available here */ } }
     document.getElementById('lb-close').focus();
   }
-  function closeLightbox() {
+  function closeLightbox(fromHistory) {
+    if (lb.hidden) return;
     lb.hidden = true;
+    document.documentElement.classList.remove('lb-open');
     lbVideo.pause(); lbVideo.innerHTML = ''; lbVideo.load(); lbYt.innerHTML = '';
     if (engine && audio && soundOn) engine.on(audio.currentTime, true);
+    if (lbHist) { lbHist = false; if (fromHistory !== true) history.back(); }
   }
+  // Back (the phone's back button or gesture) closes the film instead of leaving the site
+  let useHistory = false, lbHist = false;
+  try { useHistory = window.top === window && /^https?:$/.test(location.protocol); } catch (e) { /* framed */ }
+  if (useHistory && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('popstate', () => { if (!lb.hidden) { lbHist = false; closeLightbox(true); } });
+  document.getElementById('lb-x').addEventListener('click', closeLightbox);
+  // a swipe down closes the film too
+  let lbSwipe = null;
+  lb.addEventListener('pointerdown', (e) => { lbSwipe = e.pointerType === 'touch' ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+  lb.addEventListener('pointerup', (e) => {
+    const sw = lbSwipe; lbSwipe = null;
+    if (!sw || sw.id !== e.pointerId) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (dy > 90 && dy > Math.abs(dx) * 1.5) closeLightbox();
+  });
+  lb.addEventListener('pointercancel', () => { lbSwipe = null; });
   document.getElementById('lb-close').addEventListener('click', closeLightbox);
   lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lb.hidden) closeLightbox(); });
@@ -2062,7 +2158,9 @@ function createSound(ctx, out) {
     });
     layoutName();
   }
-  window.addEventListener('resize', resize);
+  // a phone's toolbar sliding in and out resizes the page many times in a row: rebuild once it has stopped
+  let resizeT = 0;
+  window.addEventListener('resize', () => { if (!touchUI) { resize(); return; } clearTimeout(resizeT); resizeT = setTimeout(resize, 120); });
   resize();
   const fontsP = (document.fonts && document.fonts.load) ? Promise.all([document.fonts.load(`800 280px ${DISPLAY}`), document.fonts.load(`800 150px ${DISPLAY}`)]).catch(() => {}) : Promise.resolve();
   const fontsDone = Promise.race([fontsP, new Promise((r) => setTimeout(r, 2500))]).then(() => {
@@ -2105,8 +2203,9 @@ function createSound(ctx, out) {
     if (Math.abs(hold - lastHoldSent) > 0.01 || (hold === 0 && lastHoldSent !== 0)) { snd('charge', hold); lastHoldSent = hold; }
     holdFill.style.transform = `scaleX(${hold.toFixed(3)})`;
 
+    tickGlide(now);
     const target = scrollU() - (1 - introE);
-    u = CAPTURE || reduce ? target : u + (target - u) * Math.min(1, dt * 5);
+    u = CAPTURE || reduce ? target : u + (target - u) * Math.min(1, dt * (touchUI ? 9 : 5));
     const camPos = cameraAt(Math.max(u, 0));
     const pk = CAPTURE ? 1 : Math.min(1, dt * 4);
     par.x += ((pointerSeen ? ndc.x : 0) - par.x) * pk;
@@ -2359,10 +2458,16 @@ function createSound(ctx, out) {
     welcomeEl.style.opacity = heroAmt.toFixed(3);
     holdEl.style.opacity = live ? (heroAmt * introE * (holdDone ? 0 : 1)).toFixed(3) : 0;
     swipeHint.style.opacity = touchUI && live && !swiped ? (smooth(1.5, 1.9, u) * (1 - smooth(segs - 1.4, segs - 1, u))).toFixed(3) : 0;
-    holdEl.style.pointerEvents = heroAmt > 0.5 && !holdDone ? 'auto' : 'none';
-    finder.style.opacity = live ? smooth(1.65, 2.0, u).toFixed(3) : 0;
-    finder.style.pointerEvents = u > 1.7 ? 'auto' : 'none';
-    if (u < 1.7 && finder.classList.contains('open')) toggleFinder(false);
+    // the hold bar takes touches only on its button, so a swipe can start anywhere around it
+    holdBtn.style.pointerEvents = heroAmt > 0.5 && !holdDone ? 'auto' : 'none';
+    if (narrow.matches) {
+      finder.style.opacity = live ? 1 : 0;
+      finder.style.pointerEvents = finder.classList.contains('open') ? 'auto' : 'none';
+    } else {
+      finder.style.opacity = live ? smooth(1.65, 2.0, u).toFixed(3) : 0;
+      finder.style.pointerEvents = u > 1.7 ? 'auto' : 'none';
+      if (u < 1.7 && finder.classList.contains('open')) toggleFinder(false);
+    }
     labelEl.style.opacity = live ? smooth(1.3, 1.8, u).toFixed(3) : 0;
     pill.style.opacity = live ? introE.toFixed(3) : 0;
     rulerEl.style.opacity = live ? introE.toFixed(3) : 0;
@@ -2389,6 +2494,16 @@ function createSound(ctx, out) {
     cur.x += (cur.tx - cur.x) * k; cur.y += (cur.ty - cur.y) * k;
     cursor.style.transform = `translate3d(${cur.x}px, ${cur.y}px, 0)`;
     const contactTop = contact.getBoundingClientRect().top;
+    // touch: a Play badge sits on the card in front once it has settled, so it is clear that a tap plays it
+    if (touchUI) {
+      const showPlay = live && lb.hidden && !drag && !glide && focusNow >= 0 && focusAmt > 0.9 && contactTop > innerHeight * 0.6;
+      tapPlayAmt += ((showPlay ? 1 : 0) - tapPlayAmt) * Math.min(1, dt * (showPlay ? 6 : 14));
+      if (focus >= 0 && tapPlayAmt > 0.003) {
+        panels[focus].mesh.localToWorld(tmp.set(0, 0, 0)).project(camera);
+        tapPlay.style.transform = `translate3d(${Math.round((tmp.x * 0.5 + 0.5) * innerWidth)}px, ${Math.round((-tmp.y * 0.5 + 0.5) * innerHeight)}px, 0) translate(-50%, -50%)`;
+      }
+      tapPlay.style.opacity = tapPlayAmt.toFixed(3);
+    }
     const overContact = contactTop < cur.y || gatePhase !== 'gone';
     cursor.classList.toggle('is-play', hovered !== null && !overContact);
     cursor.classList.toggle('is-off', overContact);
