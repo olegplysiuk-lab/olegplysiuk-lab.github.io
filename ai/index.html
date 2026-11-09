@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oleh Plysiuk · AI Video Portfolio</title>
+<meta name="description" content="AI video portfolio of Oleh Plysiuk: product films, character ads and music videos made with generative AI, from the idea to the final cut.">
+<link rel="canonical" href="https://olegplysiuk-lab.github.io/ai/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://olegplysiuk-lab.github.io/ai/">
+<meta property="og:title" content="Oleh Plysiuk · AI Video Portfolio">
+<meta property="og:description" content="Product films, character ads and music videos made with generative AI, from the idea to the final cut.">
+<meta property="og:image" content="https://olegplysiuk-lab.github.io/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#061113">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Onest:wght@400;500&family=Unbounded:wght@600;700&display=swap">
+<style>
+/* The AI-only companion to the main site: same deep-water colours and type, a plain grid instead of the 3D dive */
+:root {
+  --bg: #061113; --bg2: #0b2e33; --fg: #eef4f2; --muted: #9fb6b3; --line: rgb(238 244 242 / 0.14);
+  --accent: #f2a23c; --teal: #3fc7d2; --glass: rgb(10 30 33 / 0.6);
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Onest", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --gx: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left, 0px));
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(120% 60% at 70% -10%, var(--bg2), transparent 60%), var(--bg); color: var(--fg); font: 400 16px/1.55 var(--body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body.lb-open { overflow: hidden; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--gx); }
+
+/* Header */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: calc(env(safe-area-inset-top, 0px) + 22px) 0 0; font: 500 11px/1.4 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.top a { text-decoration: none; }
+.top a:hover { color: var(--accent); }
+.hero { padding: clamp(44px, 9vw, 110px) 0 clamp(28px, 5vw, 56px); }
+.kicker { margin: 0 0 14px; font: 500 12px/1.4 var(--mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(2.4rem, 7vw, 5.4rem)/0.98 var(--display); letter-spacing: -0.04em; text-transform: uppercase; }
+.lead { max-width: 60ch; margin: 22px 0 0; font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.65; color: #cfe0dd; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.tools li { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; color: #cfe0dd; }
+.tools li.ai { border-color: rgb(63 199 210 / 0.45); background: rgb(63 199 210 / 0.07); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; }
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; font: 500 12px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn--accent { border-color: var(--accent); color: var(--accent); }
+
+/* Sections */
+section { padding: clamp(26px, 4vw, 44px) 0; border-top: 1px solid var(--line); }
+.sec-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin: 0 0 20px; }
+h2 { margin: 0; font: 600 clamp(1.15rem, 2.2vw, 1.5rem)/1.2 var(--display); letter-spacing: -0.02em; text-transform: uppercase; }
+.sec-note { margin: 0; font: 400 12px/1.5 var(--mono); letter-spacing: 0.06em; color: var(--muted); }
+
+.grid { display: grid; gap: clamp(14px, 2vw, 22px); align-items: start; }
+.grid--wide { grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); }
+.grid--feature { grid-template-columns: minmax(0, 1fr); max-width: 980px; }
+/* tall and square reels pack into columns, so a short square one leaves no gap beside a tall one */
+.grid--tall { display: block; columns: 4 200px; column-gap: clamp(14px, 2vw, 22px); }
+.grid--tall .work { break-inside: avoid; margin-bottom: clamp(18px, 2.4vw, 28px); }
+@media (max-width: 520px) { .grid--tall { columns: 2; } }
+
+/* A work: the preview loops silently while it is on screen; a tap opens the whole film with sound */
+.work { margin: 0; }
+.work__play { position: relative; display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #000; cursor: pointer; aspect-ratio: var(--ar); }
+.work__play video, .work__play img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.work__play video { opacity: 0; transition: opacity 0.5s; }
+.work__play video.is-on { opacity: 1; }
+.work__play::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgb(0 0 0 / 0.55)); pointer-events: none; }
+.work__tag { position: absolute; z-index: 1; left: 10px; top: 10px; padding: 5px 9px; border-radius: 999px; background: rgb(6 17 19 / 0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); }
+.work__badge { position: absolute; z-index: 1; left: 50%; top: 50%; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px 10px 13px; border: 1px solid rgb(238 244 242 / 0.45); border-radius: 999px; background: rgb(6 17 19 / 0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transform: translate(-50%, -50%) scale(0.96); font: 500 11px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.92; transition: transform 0.25s, opacity 0.25s, background 0.25s; }
+.work__badge svg { width: 11px; height: 11px; fill: var(--accent); }
+.work__play:hover .work__badge, .work__play:focus-visible .work__badge { transform: translate(-50%, -50%) scale(1.04); opacity: 1; background: rgb(242 162 60 / 0.9); color: #1a0f02; }
+.work__play:hover .work__badge svg, .work__play:focus-visible .work__badge svg { fill: #1a0f02; }
+.work__dur { position: absolute; z-index: 1; right: 10px; bottom: 9px; font: 500 11px/1 var(--mono); letter-spacing: 0.08em; color: #dfe9e7; }
+.work figcaption { padding: 12px 2px 0; }
+.work h3 { margin: 0; font: 600 clamp(0.95rem, 1.6vw, 1.1rem)/1.2 var(--display); letter-spacing: -0.01em; text-transform: uppercase; }
+.work p { margin: 6px 0 0; font-size: 0.92rem; line-height: 1.5; color: #c2d4d1; }
+.work .fmt { font: 400 11px/1.4 var(--mono); letter-spacing: 0.08em; color: var(--muted); }
+
+/* Footer */
+footer { padding: 34px 0 calc(env(safe-area-inset-bottom, 0px) + 44px); border-top: 1px solid var(--line); }
+footer p { max-width: 62ch; margin: 0 0 18px; color: var(--muted); font-size: 0.95rem; }
+
+/* Player */
+.lb { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; align-content: center; gap: 14px; padding: calc(env(safe-area-inset-top, 0px) + 64px) var(--gx) calc(env(safe-area-inset-bottom, 0px) + 24px); background: rgb(3 9 10 / 0.95); overscroll-behavior: contain; }
+.lb video { max-width: min(100%, 1400px); max-height: 80vh; max-height: 78svh; border-radius: 12px; background: #000; }
+.lb__title { margin: 0; font: 500 12px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); text-align: center; }
+.lb__x { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 14px); right: var(--gx); display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: rgb(6 17 19 / 0.7); cursor: pointer; font-size: 17px; }
+.lb__x:hover { border-color: var(--accent); color: var(--accent); }
+@media (pointer: coarse) { .lb { touch-action: none; } }
+@media (prefers-reduced-motion: reduce) { .work__play video { transition: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <a href="../">Oleh Plysiuk</a>
+    <a href="../">Full portfolio ↗</a>
+  </div>
+
+  <header class="hero">
+    <p class="kicker">AI video portfolio</p>
+    <h1>Made with<br>generative AI</h1>
+    <p class="lead">Every film on this page is made with generative AI. I write the idea and the script, generate the scenes and characters, animate them, add voice and music, and edit the final cut. Tap any film to watch it in full with sound.</p>
+    <ul class="tools" aria-label="Tools">
+      <li class="ai">Kling</li><li class="ai">Seedance 2.5</li><li class="ai">Veo 3</li><li class="ai">Google Flow</li><li class="ai">WaveSpeed</li><li class="ai">ElevenLabs</li><li class="ai">Suno</li><li class="ai">ChatGPT</li>
+      <li>DaVinci Resolve</li><li>Premiere Pro</li><li>After Effects</li>
+    </ul>
+    <div class="actions">
+      <a class="btn btn--accent" href="mailto:olegplysiuk@gmail.com">olegplysiuk@gmail.com</a>
+      <a class="btn" href="../cv/Oleh_Plysiuk_CV.pdf" download>CV ↓</a>
+    </div>
+  </header>
+</div>
+
+<main class="wrap">
+  <section aria-labelledby="h-reel">
+    <div class="sec-head"><h2 id="h-reel">Showreel 2026</h2><p class="sec-note">One minute across industries</p></div>
+    <div class="grid grid--feature" data-works="reel"></div>
+  </section>
+  <section aria-labelledby="h-product">
+    <div class="sec-head"><h2 id="h-product">Product films</h2><p class="sec-note">16:9 · brand and product ads</p></div>
+    <div class="grid grid--wide" data-works="product"></div>
+  </section>
+  <section aria-labelledby="h-social">
+    <div class="sec-head"><h2 id="h-social">Characters and music videos</h2><p class="sec-note">9:16 and 1:1 · Reels, TikTok, Shorts</p></div>
+    <div class="grid grid--tall" data-works="social"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>Live-action work (fashion, sportswear and car-detailing shoots) is on the main site and is not part of this page.</p>
+  <div class="actions">
+    <a class="btn" href="../">Full portfolio ↗</a>
+    <a class="btn btn--accent" href="mailto:olegplysiuk@gmail.com">olegplysiuk@gmail.com</a>
+  </div>
+</footer>
+
+<div class="lb" hidden role="dialog" aria-modal="true" aria-label="Film">
+  <button class="lb__x" type="button" aria-label="Close film">✕</button>
+  <video controls playsinline preload="auto"></video>
+  <p class="lb__title"></p>
+</div>
+
+<script>
+(() => {
+  const M = '../media/';
+  const WORKS = [
+    { group: 'reel', id: 'showreel', title: 'Showreel 2026', fmt: '16:9', dur: '0:59', loop: 'loops/showreel.mp4', text: 'A minute of AI work for different industries: fashion, beauty, watches, cars and sport.' },
+    { group: 'product', id: 'space', title: 'Space', fmt: '16:9', dur: '0:24', loop: 'loops/space.mp4', text: 'Office chair ad. Every scene is generated with AI, while the chair keeps the real product’s shape and details.' },
+    { group: 'product', id: 'diamond', title: 'Diamond', fmt: '16:9', dur: '0:20', loop: 'loops/diamond.mp4', text: 'Luxury chair film. AI scenes, with the leather and the light kept consistent from shot to shot.', note: 'No sound' },
+    { group: 'product', id: 'sport', title: 'Sport', fmt: '16:9', dur: '0:13', loop: 'loops/sport.mp4', text: 'AI commercial about energy and emotion. Every shot is generated, then edited into one spot.' },
+    { group: 'social', id: 'rl9', title: 'Premium collection', fmt: '9:16', dur: '0:16', loop: M + 'rl9.mp4', text: 'Luxury chairs in AI-generated product scenes.' },
+    { group: 'social', id: 'rl10', title: 'Gorilla test', fmt: '1:1', dur: '0:21', loop: 'loops/rl10.mp4', text: 'AI character ad: story, characters and edit.' },
+    { group: 'social', id: 'rl11', title: 'Panda comfort', fmt: '1:1', dur: '0:20', loop: 'loops/rl11.mp4', text: 'AI character ad: a panda tries out the chair.' },
+    { group: 'social', id: 'rl5', title: 'Cyber metal', fmt: '9:16', dur: '0:57', loop: M + 'rl5.mp4', text: 'AI characters, generated and edited into a music video.' },
+    { group: 'social', id: 'rl6', title: 'Folk metal band', fmt: '9:16', dur: '0:40', loop: M + 'rl6.mp4', text: 'AI music video: a generated band, edited to the track.' },
+    { group: 'social', id: 'rl7', title: 'Dark strings', fmt: '9:16', dur: '0:35', loop: M + 'rl7.mp4', text: 'AI music video: generated characters, edited to the track.' },
+    { group: 'social', id: 'rl8', title: 'Rock girl', fmt: '9:16', dur: '0:33', loop: M + 'rl8.mp4', text: 'AI music video: a generated character, edited to the track.' },
+  ];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const play = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg>';
+
+  WORKS.forEach((w) => {
+    const [aw, ah] = w.fmt.split(':');
+    const fig = document.createElement('figure');
+    fig.className = 'work';
+    fig.innerHTML = `
+      <button class="work__play" type="button" style="--ar:${aw} / ${ah}" aria-label="Play ${w.title}">
+        <img src="posters/${w.id}.jpg" alt="" loading="lazy" decoding="async">
+        <video muted loop playsinline preload="none" aria-hidden="true"></video>
+        <span class="work__tag">AI</span>
+        <span class="work__badge">${play}Play</span>
+        <span class="work__dur">${w.dur}</span>
+      </button>
+      <figcaption><h3>${w.title}</h3><p>${w.text}</p><span class="fmt">${w.fmt}${w.note ? ' · ' + w.note : ''}</span></figcaption>`;
+    document.querySelector(`[data-works="${w.group}"]`).append(fig);
+    const btn = fig.querySelector('.work__play'), v = fig.querySelector('video');
+    w.v = v;
+    v.dataset.src = w.loop;
+    v.addEventListener('playing', () => v.classList.add('is-on'));
+    btn.addEventListener('click', () => openFilm(w));
+  });
+
+  // previews play only while they are on screen, so a phone decodes a few at a time
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      const v = e.target.querySelector('video');
+      if (e.isIntersecting) {
+        if (!v.src) v.src = v.dataset.src;
+        v.play().catch(() => {});
+      } else if (!v.paused) v.pause();
+    }), { threshold: 0.35 });
+    document.querySelectorAll('.work__play').forEach((b) => io.observe(b));
+  }
+
+  // The player: the whole film with sound. Close with ✕, Esc, a tap outside the film, a swipe down or Back
+  const lb = document.querySelector('.lb'), lbV = lb.querySelector('video'), lbT = lb.querySelector('.lb__title');
+  let useHistory = false, inHistory = false;
+  try { useHistory = window.top === window && /^https?:$/.test(location.protocol); } catch (e) { /* framed */ }
+  function openFilm(w) {
+    WORKS.forEach((o) => { if (!o.v.paused) o.v.pause(); });
+    lbV.src = `${M}full/${w.id}.mp4`;
+    lbV.muted = false;
+    lbV.play().catch(() => { lbV.muted = true; lbV.play().catch(() => {}); });
+    lbT.textContent = `${w.title} · ${w.fmt} · ${w.dur}`;
+    lb.hidden = false;
+    document.body.classList.add('lb-open');
+    if (useHistory && !inHistory) { try { history.pushState({ film: w.id }, ''); inHistory = true; } catch (e) { /* no history here */ } }
+    lb.querySelector('.lb__x').focus();
+  }
+  function closeFilm(fromHistory) {
+    if (lb.hidden) return;
+    lb.hidden = true;
+    document.body.classList.remove('lb-open');
+    lbV.pause(); lbV.removeAttribute('src'); lbV.load();
+    if (inHistory) { inHistory = false; if (fromHistory !== true) history.back(); }
+    document.querySelectorAll('.work__play').forEach((b) => { const r = b.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) b.querySelector('video').play().catch(() => {}); });
+  }
+  window.addEventListener('popstate', () => { if (!lb.hidden) { inHistory = false; closeFilm(true); } });
+  lb.querySelector('.lb__x').addEventListener('click', closeFilm);
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeFilm(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFilm(); });
+  let sw = null;
+  lb.addEventListener('pointerdown', (e) => { sw = e.pointerType === 'touch' ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null; });
+  lb.addEventListener('pointerup', (e) => {
+    const s = sw; sw = null;
+    if (!s || s.id !== e.pointerId) return;
+    const dx = e.clientX - s.x, dy = e.clientY - s.y;
+    if (dy > 90 && dy > Math.abs(dx) * 1.5) closeFilm();
+  });
+  lb.addEventListener('pointercancel', () => { sw = null; });
+})();
+</script>
+</body>
+</html>
