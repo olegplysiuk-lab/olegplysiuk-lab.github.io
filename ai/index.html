@@ -15,9 +15,7 @@
 <meta name="theme-color" content="#061113">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Onest:wght@400;500&family=Unbounded:wght@600;700&display=swap">
+<link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 /* The AI-only companion to the main site: same deep-water colours and type, a plain grid instead of the 3D dive */
 :root {
@@ -44,6 +42,7 @@ button { font: inherit; color: inherit; }
 .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: calc(env(safe-area-inset-top, 0px) + 22px) 0 0; font: 500 11px/1.4 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
 .top a { text-decoration: none; }
 .top a:hover { color: var(--accent); }
+.top__nav { display: flex; gap: 20px; }
 .hero { padding: clamp(44px, 9vw, 110px) 0 clamp(28px, 5vw, 56px); }
 .kicker { margin: 0 0 14px; font: 500 12px/1.4 var(--mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
 h1 { margin: 0; font: 700 clamp(2.4rem, 7vw, 5.4rem)/0.98 var(--display); letter-spacing: -0.04em; text-transform: uppercase; }
@@ -107,7 +106,7 @@ footer p { max-width: 62ch; margin: 0 0 18px; color: var(--muted); font-size: 0.
 <div class="wrap">
   <div class="top">
     <a href="../">Oleh Plysiuk</a>
-    <a href="../">Full portfolio ↗</a>
+    <span class="top__nav"><a href="../services/">Services</a><a href="../">Full portfolio ↗</a></span>
   </div>
 
   <header class="hero">
@@ -143,6 +142,7 @@ footer p { max-width: 62ch; margin: 0 0 18px; color: var(--muted); font-size: 0.
 <footer class="wrap">
   <p>Live-action work (fashion, sportswear and car-detailing shoots) is on the main site and is not part of this page.</p>
   <div class="actions">
+    <a class="btn" href="../services/">Services and FAQ</a>
     <a class="btn" href="../">Full portfolio ↗</a>
     <a class="btn btn--accent" href="mailto:olegplysiuk@gmail.com">olegplysiuk@gmail.com</a>
   </div>

@@ -1,0 +1,35 @@
+# Oleh Plysiuk · AI Video Creator
+
+> Oleh Plysiuk (also written Oleg Plysiuk, Олег Плисюк) is an AI video creator, videographer and editor based in Warsaw, Poland. He makes commercial video for brands and agencies by combining real camera work with generative AI, and makes the sound and music himself, from the first idea to the final cut. He works on location in Warsaw and remotely, in Ukrainian, Polish and English.
+
+## What he offers
+
+- Product ads and AI product scenes built from real product photos or footage
+- Brand and image films (60–90 s): script, live shoot or AI scenes, edit, sound and music
+- Reels and TikTok videos as a monthly package (9:16)
+- AI characters who talk: a mascot or digital presenter with its own voice and lip-sync, labelled as AI
+- Sound design, voice-over and original music made together with the video
+- AI video subcontracting for agencies: white label, NDA, agreed deadlines, pitch visuals and animatics
+- Interactive 3D websites like his own portfolio, with films playing inside and sound
+- Prices are quoted per project after a short brief
+
+## Pages
+
+- [Services, process and FAQ (English)](https://olegplysiuk-lab.github.io/services/): services, agencies, websites, how he works, typical projects, FAQ, contact
+- [Usługi, proces i FAQ (Polski)](https://olegplysiuk-lab.github.io/pl/uslugi/): the same page in Polish
+- [Portfolio](https://olegplysiuk-lab.github.io/): interactive 3D portfolio with the films, reels, about and contact
+- [AI-only portfolio](https://olegplysiuk-lab.github.io/ai/): a plain grid of the works made with generative AI
+- [CV, English (PDF)](https://olegplysiuk-lab.github.io/cv/Oleh_Plysiuk_CV.pdf)
+- [CV, Polish (PDF)](https://olegplysiuk-lab.github.io/cv/Oleh_Plysiuk_CV_PL.pdf)
+- [Behance](https://www.behance.net/fc6d06c6)
+
+## Facts
+
+- Based in Warsaw, Poland; works on location in Warsaw and remotely
+- About three years of commercial filming and editing: fashion, sportswear, car detailing, furniture
+- Tools: DaVinci Resolve Studio, Premiere Pro, After Effects, CapCut, Photoshop, Lightroom; Kling, Seedance, Veo, Google Flow, WaveSpeed, ElevenLabs, Suno, ChatGPT
+- Formats: 16:9, 9:16, 1:1 and others, for websites, ads, YouTube, Instagram Reels and TikTok
+- Languages: Ukrainian (native), Polish, English
+- Own music project: Mild 9 Records
+- AI-generated scenes and AI voices are labelled, in line with Article 50 of the EU AI Act
+- Some portfolio works show third-party brands; they are spec projects, not commissioned or endorsed by those brands
