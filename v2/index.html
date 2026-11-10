@@ -181,6 +181,11 @@ button { font: inherit; color: inherit; }
 .label__meta { margin: 6px 0 0; font-size: 0.9rem; color: var(--muted); }
 .label.reveal .label__title { animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .label.reveal .label__meta { animation: rise 0.8s 0.12s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+/* v2: ask the hologram about a work */
+.label__talk { display: inline-flex; align-items: center; gap: 8px; margin: 12px 0 0; padding: 9px 15px 9px 12px; border: 1px solid rgb(75 227 160 / 0.6); border-radius: 999px; background: rgb(6 17 19 / 0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #c9f7e2; font: 500 11px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; pointer-events: none; transition: background 0.2s, border-color 0.2s; }
+.label__talk i { width: 8px; height: 8px; border-radius: 50%; background: #4be3a0; box-shadow: 0 0 0 3px rgb(75 227 160 / 0.25); }
+.label__talk:hover, .label__talk.is-on { background: rgb(75 227 160 / 0.2); border-color: #4be3a0; }
+.label__talk.is-on i { animation: blink 0.9s steps(1) infinite; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 
 /* Contact */
@@ -523,9 +528,12 @@ function createSound(ctx, out) {
       if (musicStarted) { musicG.gain.cancelScheduledValues(t); musicG.gain.setTargetAtTime(v ? MUSIC_LEVEL : 0, t, 0.3); }
     },
     assets: {},
+    // the music steps back while he talks
+    duck(t, v) { if (musicStarted) { musicG.gain.cancelScheduledValues(t); musicG.gain.setTargetAtTime(isOn ? MUSIC_LEVEL * (v ? 0.38 : 1) : 0, t, 0.25); } },
+    stopVoice(t) { if (api.voiceSrc) { try { api.voiceSrc.stop(t); } catch (e) { /* already done */ } api.voiceSrc = null; } },
     voice(t) {
       if (!api.assets.voice) return;
-      const s = ctx.createBufferSource(); s.buffer = api.assets.voice; s.connect(voiceG); s.start(t);
+      const s = ctx.createBufferSource(); s.buffer = api.assets.voice; s.connect(voiceG); s.start(t); api.voiceSrc = s;
     },
     // The soundtrack starts at m.offset and loops m.loopStart..m.loopEnd (whole bars) without a seam.
     // The synth drone and pad step back so the music carries the melody; the ocean noise stays.
@@ -657,7 +665,7 @@ function createSound(ctx, out) {
   // just before its first drop (0:38 in the song), timed so the drop lands on the third echo of "world"; it then loops
   // 48 bars from that drop. The file starts on the drop's downbeat, so offset is where in it playback begins.
   // Both files are fetched while the gate loads.
-  const WELCOME_VOICE = '../media/holo/intro-en.mp3', MUSIC_IN = 10.6, HOLO_LEAD = 1.6; // he speaks once the camera has settled
+  const WELCOME_VOICE = '../media/holo/intro-en.mp3', MUSIC_IN = 0, HOLO_LEAD = 1.0; // he rises out of the ring first, then speaks; the music starts at once
   const MUSIC = { src: '../media/music.mp3', loopStart: 0, loopEnd: 115.2, offset: 0.338, bar: 2.4 };
   const audioBytes = {}, decoded = {};
   const fetchAudio = (url) => fetch(url).then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(r.status)));
@@ -688,9 +696,10 @@ function createSound(ctx, out) {
     }) : Promise.resolve(false);
     Promise.all([spoke, decodeAudio('music')]).then(([v, b]) => {
       if (!b) return;
-      const at = Math.max(v ? voiceAt + MUSIC_IN : voiceAt, audio.currentTime + 0.05);
+      const at = audio.currentTime + 0.05;
       engine.assets.music = b; engine.music(at, MUSIC);
       musicT0 = at;
+      if (v) { engine.duck(Math.max(at, voiceAt), true); engine.duck(voiceAt + HOLO.dur - 0.2, false); }
     });
   }
   // Where the music is within its bar (0..1), or null before it starts; Lumen's pulse locks to it
@@ -1481,7 +1490,7 @@ function createSound(ctx, out) {
   const SDF = `float sdRound(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.)) + min(max(q.x, q.y), 0.) - r; }
     float cover(float d){ return clamp(.5 - d/max(fwidth(d), 1e-5), 0., 1.); }`;
   const PANEL_FS = `${NOISE} ${FOG} ${SDF}
-    uniform sampler2D map; uniform float uTime, uHover, uReady, uShow, uDim, uSoon; uniform vec2 uSize;
+    uniform sampler2D map; uniform float uTime, uHover, uReady, uShow, uDim, uSoon, uTalk; uniform vec2 uSize;
     varying vec2 vUv; varying float vDist; varying vec3 vN, vV;
     void main(){
       vec2 lp = (vUv - .5)*uSize;
@@ -1513,6 +1522,8 @@ function createSound(ctx, out) {
       col *= 1. - smoothstep(-.18, -.05, d)*.18;
       col = mix(col, mix(vec3(.75,.95,1.), irid, .5), rim*.35 + bevel*.45);
       col = mix(col, vec3(.95,.63,.25), bevel*uHover*.8);
+      col = mix(col, vec3(.29,.89,.63), bevel*uTalk*.9);
+      col += vec3(.29,.89,.63)*rim*uTalk*.12;
       col = mix(col, uFogCol, smoothstep(uFogNear, uFogFar, vDist));
       // alpha is the smooth edge and the fade in or out; the card's blending also clears the buffer's alpha under it,
       // which tells the bloom pass to leave the footage alone so it keeps its own contrast
@@ -1591,7 +1602,7 @@ function createSound(ctx, out) {
     }
     tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
     const mat = new THREE.ShaderMaterial({
-      uniforms: { ...G, map: { value: tex }, uHover: { value: 0 }, uReady: { value: s.soon ? 1 : 0 }, uShow: { value: 0 }, uDim: { value: 0 }, uSoon: { value: s.soon ? 1 : 0 }, uSize: { value: new THREE.Vector2(w, h) } },
+      uniforms: { ...G, map: { value: tex }, uHover: { value: 0 }, uTalk: { value: 0 }, uReady: { value: s.soon ? 1 : 0 }, uShow: { value: 0 }, uDim: { value: 0 }, uSoon: { value: s.soon ? 1 : 0 }, uSize: { value: new THREE.Vector2(w, h) } },
       vertexShader: PANEL_VS, fragmentShader: PANEL_FS, extensions: { derivatives: true },
       // drawn with the opaque objects (so the jellyfish stays in front), but blended: colour over the scene by the
       // edge coverage, alpha cleared under the card so bloom skips the footage
@@ -1632,7 +1643,17 @@ function createSound(ctx, out) {
     title.textContent = s.label;
     label.querySelector('.label__meta').textContent = s.meta;
     labelsBox.append(label);
-    panels.push({ s, kind, k, v, tex, tab, mesh, mat, glassMat, barMat, w, h, label, hover: 0, fit: 1, uploaded: false });
+    // the works he can tell about get a button under their caption
+    let talkBtn = null;
+    const pi = panels.length;
+    if (['showreel', 'night-street', 'space', 'diamond', 'sport', 'rl10', 'rl5', 'rl1'].includes(s.id)) {
+      talkBtn = document.createElement('button');
+      talkBtn.type = 'button'; talkBtn.className = 'label__talk';
+      talkBtn.innerHTML = '<i aria-hidden="true"></i><span>Tell me more</span>';
+      talkBtn.addEventListener('click', (e) => { e.stopPropagation(); startNarr(pi); });
+      label.append(talkBtn);
+    }
+    panels.push({ s, kind, k, v, tex, tab, mesh, mat, glassMat, barMat, w, h, label, talkBtn, talk: 0, hover: 0, fit: 1, uploaded: false });
   }
   SCENES.forEach((s, k) => makeTab(s, 'work', k));
   REELS.forEach((s, k) => makeTab(s, 'reel', k));
@@ -2022,6 +2043,7 @@ function createSound(ctx, out) {
   const EMBED_YT = /(^|\.)github\.io$/i.test(location.hostname);
   // Play opens the whole film right here with its own sound; Lumen's soundtrack fades out until the lightbox closes
   function openLightbox(i) {
+    stopNarr();
     const s = panels[i].s;
     const embed = EMBED_YT && !!s.yt && !s.soon;
     lb.setAttribute('aria-label', s.label);
@@ -2181,15 +2203,20 @@ function createSound(ctx, out) {
   // A clip generated on black, packed as [person | mask] on top and the shine (particles, halos) at bottom-left.
   // He rises out of a ring of light when the visitor dives in and says who he is, then stays on as the guide:
   // in the middle on the first screen, smaller beside the films, and in the centre of the reel ring.
-  const HOLO = { intro: '../media/holo/intro.mp4', dur: 9.97, size: 5.4 };
-  const holoVid = document.createElement('video');
-  holoVid.muted = true; holoVid.playsInline = true; holoVid.setAttribute('playsinline', ''); holoVid.preload = 'auto';
-  if (!CAPTURE) holoVid.src = HOLO.intro;
-  const holoTex = new THREE.VideoTexture(holoVid);
-  holoTex.minFilter = THREE.LinearFilter; holoTex.magFilter = THREE.LinearFilter; holoTex.generateMipmaps = false;
-  const HU = { uVid: { value: holoTex }, uTime: { value: 0 }, uRise: { value: 0 }, uTexel: { value: new THREE.Vector2(1 / 720, 1 / 720) } };
+  const HOLO = { dur: 9.97, size: 5.4, clips: { intro: ['../media/holo/intro.mp4', false, 'auto'], idle: ['../media/holo/idle.mp4', true, 'auto'], talk: ['../media/holo/talk.mp4', true, 'metadata'] } };
+  const holoClips = {};
+  Object.entries(HOLO.clips).forEach(([k, [src, loop, preload]]) => {
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.loop = loop; v.preload = preload;
+    if (!CAPTURE) v.src = src;
+    const tx = new THREE.VideoTexture(v);
+    tx.minFilter = THREE.LinearFilter; tx.magFilter = THREE.LinearFilter; tx.generateMipmaps = false;
+    holoClips[k] = { v, tx };
+  });
+  const holoVid = holoClips.intro.v;
+  const HU = { uVid: { value: holoClips.intro.tx }, uTime: { value: 0 }, uRise: { value: 0 }, uCut: { value: 0 }, uTexel: { value: new THREE.Vector2(1 / 720, 1 / 720) } };
   const HVERT = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }';
-  const HCOMMON = `uniform sampler2D uVid; uniform float uTime, uRise; uniform vec2 uTexel; varying vec2 vUv;
+  const HCOMMON = `uniform sampler2D uVid; uniform float uTime, uRise, uCut; uniform vec2 uTexel; varying vec2 vUv;
       float hh(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
       const float TOP = 1080./1620.;
       vec3 rgbAt(vec2 uv){ uv = clamp(uv, .0005, .9995); return texture2D(uVid, vec2(uv.x*.5, 1. - TOP + uv.y*TOP)).rgb; }
@@ -2198,7 +2225,9 @@ function createSound(ctx, out) {
       float riseMask(float y, vec2 cell, out float front){
         front = uRise*1.15 - .05;
         float n = hh(floor(cell) + floor(uTime*12.));
-        return 1. - smoothstep(front - .03, front + .03, y + (n - .5)*.05);
+        float rise = 1. - smoothstep(front - .03, front + .03, y + (n - .5)*.05);
+        // a clip framed from the waist up dissolves into points at its lower edge
+        return rise*(uCut > 0. ? smoothstep(uCut, uCut + .1, y + (n - .5)*.08) : 1.);
       }`;
   // the person keeps the generated look with a light digital touch; drawn like the cards, so the glow pass leaves his face alone
   const holoPerson = new THREE.Mesh(new THREE.PlaneGeometry(HOLO.size, HOLO.size), new THREE.ShaderMaterial({
@@ -2283,12 +2312,22 @@ function createSound(ctx, out) {
   holo.add(holoPerson, holoGlow, holoRing, holoBeam);
   holo.visible = false;
   scene.add(holo);
-  let holoT0 = null, holoFix = -9;
-  // starts the clip together with the voice (lead = seconds from now until the voice starts)
-  // He starts as the visitor dives in, with or without sound; when the voice is decoded the clip is nudged onto it.
-  let holoTimer = 0;
+  let holoT0 = null, holoFix = -9, holoTimer = 0, holoClip = 'intro', holoSwapT = -9e9, introDone = false;
+  const holoNear = new THREE.Vector3(), HOLO_PHONE = { front: 1.2, down: -2.25, scale: 0.3, ringDown: -1.6 };
+  // switches the clip he plays, with a quick rewrite from the ring upwards
+  function holoUse(k) {
+    if (holoClip === k) return;
+    holoClips[holoClip].v.pause();
+    holoClip = k;
+    const c = holoClips[k];
+    HU.uVid.value = c.tx; HU.uCut.value = k === 'talk' ? 0.1 : 0;
+    if (k !== 'intro') { c.v.currentTime = 0; c.v.play().catch(() => {}); }
+    holoSwapT = performance.now();
+  }
+  // He starts as the visitor dives in, with or without sound: written in from the ring, then the clip and the voice
+  // start together (lead = seconds from now); once the voice is decoded the clip is nudged onto it.
   function holoSync(lead) {
-    if (CAPTURE) return;
+    if (CAPTURE || holoClip !== 'intro') return;
     const t0 = performance.now() + lead * 1000;
     if (holoT0 !== null && Math.abs(t0 - holoT0) < 80) return;
     holoT0 = t0;
@@ -2298,19 +2337,67 @@ function createSound(ctx, out) {
   }
   function updateHolo(t, u) {
     if (holoT0 === null) { holo.visible = false; return; }
-    const e = (performance.now() - holoT0) / 1000;
-    holo.visible = e > -0.3;
-    // keep the clip on the voice: if a slow device lets it fall behind, catch it up (at most every two seconds)
-    if (e > 0.5 && e < HOLO.dur - 0.5 && !holoVid.paused && Math.abs(holoVid.currentTime - e) > 0.3 && t - holoFix > 2) { holoVid.currentTime = e; holoFix = t; }
-    HU.uTime.value = t; HU.uRise.value = clamp01((e - 0.15) / 1.5);
-    holoRing.material.uniforms.uTime.value = t; holoRing.material.uniforms.uOn.value = clamp01((e + 0.3) / 1.2);
-    holoBeam.material.uniforms.uTime.value = t; holoBeam.material.uniforms.uAmt.value = Math.sin(clamp01(e / 2.4) * Math.PI);
+    const now = performance.now(), e = (now - holoT0) / 1000;
+    holo.visible = e > -1;
+    if (holoClip === 'intro') {
+      // keep the clip on the voice: if a slow device lets it fall behind, catch it up (at most every two seconds)
+      if (e > 0.5 && e < HOLO.dur - 0.5 && !holoVid.paused && Math.abs(holoVid.currentTime - e) > 0.3 && t - holoFix > 2) { holoVid.currentTime = e; holoFix = t; }
+      if (e > HOLO.dur - 0.05) { introDone = true; holoUse('idle'); }
+      HU.uRise.value = clamp01((e + 0.9) / 0.8);
+    } else HU.uRise.value = clamp01((now - holoSwapT) / 450);
+    HU.uTime.value = t;
+    holoRing.material.uniforms.uTime.value = t; holoRing.material.uniforms.uOn.value = clamp01((e + 1) / 0.6);
+    holoBeam.material.uniforms.uTime.value = t; holoBeam.material.uniforms.uAmt.value = Math.sin(clamp01((e + 1) / 1.8) * Math.PI);
     // full size on the first screen, smaller beside the films, a little larger in the middle of the reel ring
     const sc = 0.92 - 0.36 * smooth(1.25, 1.9, u) + 0.2 * smooth(RING0 - 1.1, RING0 - 0.3, u);
     holo.scale.setScalar(sc);
     holo.position.copy(crePos);
     holo.position.y += -0.35 * sc - 0.45 * (1 - smooth(1.25, 1.9, u));   // on the first screen a little lower, clear of the welcome line
+    // on a phone the view looks straight at the card, so he steps in front of it, small, below its caption
+    if (camera.aspect < 0.8) {
+      const wk = smooth(1.45, 1.9, u) * (1 - smooth(RING0 - 1.2, RING0 - 0.55, u));
+      const near = panels[Math.min(SCENES.length - 1, Math.max(0, Math.round(u) - 2))];
+      if (wk > 0 && near) {
+        holoNear.copy(camera.position).sub(near.tab.position).setY(0).normalize().multiplyScalar(HOLO_PHONE.front);
+        holoNear.add(near.tab.position); holoNear.y += HOLO_PHONE.down;
+        holo.position.lerp(holoNear, wk);
+        holo.scale.setScalar(sc + (HOLO_PHONE.scale - sc) * wk);
+      }
+      const rk = smooth(RING0 - 0.9, RING0 - 0.3, u);
+      holo.position.y += HOLO_PHONE.ringDown * rk;
+    }
     holo.lookAt(camera.position.x, holo.position.y, camera.position.z);
+  }
+
+  // ---------- He tells about a work when the visitor asks, never by himself while scrolling ----------
+  let narr = null;
+  function narrButton(i, playing) {
+    const b = panels[i].talkBtn;
+    if (!b) return;
+    b.classList.toggle('is-on', playing);
+    b.querySelector('span').textContent = playing ? 'Stop' : 'Tell me more';
+  }
+  function stopNarr() {
+    if (!narr) return;
+    const n = narr; narr = null;
+    const el = n.el, v0 = el.volume, t0 = performance.now();
+    const fade = () => { const k = 1 - (performance.now() - t0) / 300; if (k <= 0) { el.pause(); return; } el.volume = v0 * k; requestAnimationFrame(fade); };
+    fade();
+    narrButton(n.i, false);
+    if (engine && audio) engine.duck(audio.currentTime, false);
+    holoUse('idle');
+  }
+  function startNarr(i) {
+    if (narr && narr.i === i) { stopNarr(); return; }
+    stopNarr();
+    const el = new Audio(`../media/holo/narr/${panels[i].s.id}.mp3`);
+    el.play().catch(() => {});
+    narr = { i, el };
+    el.addEventListener('ended', () => { if (narr && narr.el === el) stopNarr(); });
+    narrButton(i, true);
+    if (engine && audio) { engine.stopVoice(audio.currentTime); engine.duck(audio.currentTime, true); }
+    introDone = true;
+    holoUse('talk');
   }
 
   // ---------- Main loop ----------
@@ -2503,6 +2590,7 @@ function createSound(ctx, out) {
     ring.material.uniforms.uShow.value = smooth(0.2, 0.8, ringAmt);
     ring.material.uniforms.uSwap.value = Math.min(1, ring.material.uniforms.uSwap.value + dt * 1.4);
 
+    if (narr && Math.abs(u - panels[narr.i].s.kf) > 0.6) stopNarr();
     // Tabs
     const hit = pointerSeen && lb.hidden && gatePhase === 'gone' ? raycaster.intersectObjects(panels.filter((p) => p.tab.visible).map((x) => x.mesh))[0] : null;
     const hovered = hit ? hit.object.userData.index : null;
@@ -2515,6 +2603,11 @@ function createSound(ctx, out) {
         if (active && p.v.paused) p.v.play().catch(() => {});
         else if (!active && !p.v.paused) p.v.pause();
       }
+      // green rim: he can tell about this one (hover on a desktop, the card in front on a phone, pulsing while he talks)
+      const talkGoal = !p.talkBtn ? 0 : narr && narr.i === i ? 0.75 + 0.25 * Math.sin(t * 5) : (touchUI ? focusNow === i : hovered === i) ? 1 : 0;
+      p.talk += (talkGoal - p.talk) * Math.min(1, dt * 8);
+      p.mat.uniforms.uTalk.value = p.talk;
+      if (p.talkBtn) p.talkBtn.style.pointerEvents = p.label.style.opacity > 0.5 ? 'auto' : 'none';
       const wasHover = p.hover > 0.5;
       p.hover += ((hovered === i ? 1 : 0) - p.hover) * (CAPTURE ? 0.35 : Math.min(1, dt * 10));
       if (!wasHover && p.hover > 0.5) snd('tick', 1);
