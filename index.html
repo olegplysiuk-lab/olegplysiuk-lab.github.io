@@ -396,13 +396,19 @@ button { font: inherit; color: inherit; }
 .finder button { border: 0; background: none; padding: 2px 0; cursor: pointer; font: 500 11px/1.3 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: #9fb7ff; text-align: left; transition: color 0.2s, transform 0.2s; }
 .finder button:hover, .finder button.is-on { color: var(--accent); transform: translateX(4px); }
 
-/* Palette */
-.palette { position: fixed; z-index: 7; right: var(--gr); bottom: var(--bottom); display: grid; justify-items: end; gap: 8px; }
-.palette__row { display: flex; gap: 6px; padding: 7px; border: 1px solid var(--line); border-radius: 12px; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.sw { width: 34px; height: 14px; border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.25); background: var(--c); cursor: pointer; padding: 0; transition: transform 0.2s, box-shadow 0.2s; }
-.sw:hover { transform: translateY(-2px); }
-.sw[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--fg); }
-.palette__label { font: 500 9px/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+/* Who made all this: a small card with his photo on the first screen, bottom right */
+.hero.me-card { left: auto; right: var(--gr); bottom: calc(var(--bottom) + 58px); max-width: none; width: min(390px, calc(100vw - var(--gl) - var(--gr))); }
+.me { display: flex; gap: 14px; align-items: center; padding: 12px 18px 12px 12px; border: 1px solid var(--line); border-radius: 18px; background: rgb(6 20 22 / 0.66); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 20px 44px -22px rgb(0 0 0 / 0.9), inset 0 0 0 1px rgb(63 199 210 / 0.06); }
+.me__photo { flex: none; position: relative; width: 76px; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px rgb(238 244 242 / 0.16), 0 0 26px rgb(63 199 210 / 0.22); }
+.me__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.me__text { min-width: 0; }
+.me__text p { margin: 0; }
+.me__name { font: 700 1.05rem/1.15 var(--display); letter-spacing: -0.01em; }
+.me .kicker { margin: 3px 0 7px; font-size: 10px; letter-spacing: 0.18em; }
+.me .role { font-size: 0.86rem; line-height: 1.45; text-shadow: none; }
+.me__status { display: inline-flex; align-items: center; gap: 8px; margin-top: 9px !important; font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: #7ee2a8; }
+.me__status i { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: ping 2.2s ease-out infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgb(74 222 128 / 0.55); } 70%, 100% { box-shadow: 0 0 0 8px rgb(74 222 128 / 0); } }
 
 /* Labels pinned under each tab */
 .labels { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
@@ -494,7 +500,7 @@ html.lb-open, html.lb-open body { overflow: hidden; }
 
 .fade { transition: opacity 0.4s; }
 @media (max-width: 760px) {
-  .ruler__label, .palette__label, .hud--tr br, .hud--tr #depth { display: none; }
+  .ruler__label, .hud--tr br, .hud--tr #depth { display: none; }
   /* phones: the finder opens as a list under the top pill, from its Work button */
   .finder { left: 50%; bottom: auto; top: calc(var(--top) + 78px); transform: translateX(-50%); }
   .finder__toggle { display: none; }
@@ -509,8 +515,11 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   .label { max-width: 70vw; }
   .hold { width: calc(100% - 2 * var(--gl)); bottom: calc(var(--bottom) + 50px); }
   .hero { bottom: calc(var(--bottom) + 116px); }
+  .hero.me-card { left: var(--gl); right: var(--gr); bottom: calc(var(--bottom) + 112px); width: auto; }
+  .me { gap: 12px; padding: 10px 14px 10px 10px; }
+  .me__photo { width: 62px; }
+  .me .role { font-size: 0.82rem; }
   .hud--bc { bottom: calc(var(--bottom) + 52px); }
-  .sw { width: 22px; }
 }
 @media (max-width: 700px) {
   .welcome__w { display: block; }
@@ -529,12 +538,11 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   .pill { padding: 0 14px; }
   .pill button { padding: 12px 6px; }
   .sound { min-height: 40px; }
-  .palette__row { gap: 9px; padding: 8px; }
-  .sw { width: 24px; height: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .about__photo img { transform: none; filter: none; transition: none; }
   .about__light { animation: none; }
+  .me__status i { animation: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .welcome__ch { transition: opacity 0.6s; transform: none; filter: none; }
@@ -567,11 +575,21 @@ html.lb-open, html.lb-open body { overflow: hidden; }
 
 <div class="welcome" aria-hidden="true"><p><span class="welcome__w">Welcome</span> <span class="welcome__w">to my world</span></p></div>
 
-<div class="hero fade">
+<div class="hero me-card fade">
   <h1 class="sr-only">Oleh Plysiuk, AI video creator and videographer in Warsaw</h1>
   <p class="sr-only">Welcome to my world</p>
-  <p class="kicker">Medusa Lab · AI video creator · Warsaw</p>
-  <p class="role">I’m Oleh Plysiuk. One person, not an agency: every film here I made myself, from the idea and the camera to the AI scenes, the edit and the sound.</p>
+  <div class="me">
+    <picture class="me__photo">
+      <source srcset="media/oleh-sm.webp" type="image/webp">
+      <img src="media/oleh-sm.jpg" alt="Oleh Plysiuk with his camera" width="240" height="300" decoding="async">
+    </picture>
+    <div class="me__text">
+      <p class="me__name">Oleh Plysiuk</p>
+      <p class="kicker">AI video creator · Warsaw</p>
+      <p class="role">Independent creator. Every film here is my own work: idea, camera, AI scenes, edit and sound.</p>
+      <p class="me__status"><i aria-hidden="true"></i>Available for projects</p>
+    </div>
+  </div>
 </div>
 
 <div class="hold fade">
@@ -592,16 +610,6 @@ html.lb-open, html.lb-open body { overflow: hidden; }
     <li><button type="button" data-go="contact">→ Contact</button></li>
   </ul>
 </nav>
-
-<div class="palette fade" role="group" aria-label="Colour Lumen">
-  <div class="palette__row">
-    <button class="sw" type="button" data-p="0" aria-pressed="true" aria-label="Teal" style="--c:#3fc7d2"></button>
-    <button class="sw" type="button" data-p="1" aria-pressed="false" aria-label="Violet" style="--c:#b07cff"></button>
-    <button class="sw" type="button" data-p="2" aria-pressed="false" aria-label="Coral" style="--c:#ff6f91"></button>
-    <button class="sw" type="button" data-p="3" aria-pressed="false" aria-label="Tungsten" style="--c:#f2a23c"></button>
-  </div>
-  <span class="palette__label">Colour Lumen</span>
-</div>
 
 <button class="sound fade" type="button" id="sound" aria-pressed="true"><span class="sound__bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span id="sound-label">Sound on</span></button>
 
@@ -666,7 +674,7 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   <div class="gate__intro">
     <p class="gate__brand">Medusa Lab</p>
     <p class="gate__who">Oleh Plysiuk · AI video creator · Warsaw</p>
-    <p class="gate__lead">One creator, not an agency. Every film here is my own work: the idea, the camera, the AI scenes, the edit and the sound.</p>
+    <p class="gate__lead">An independent creator. Every film here is my own work: the idea, the camera, the AI scenes, the edit and the sound.</p>
   </div>
   <div class="gate__row" id="gate-load">
     <span class="gate__word">Loading</span>
@@ -1045,7 +1053,6 @@ function createSound(ctx, out) {
   const finder = document.querySelector('.finder');
   const pill = document.querySelector('.pill');
   const rulerEl = document.querySelector('.ruler');
-  const paletteEl = document.querySelector('.palette');
   const gate = document.getElementById('gate');
   const labelEl = document.getElementById('scene-label');
 
@@ -2194,14 +2201,9 @@ function createSound(ctx, out) {
   rulerMark.className = 'ruler__mark';
   rulerEl.append(rulerMark);
 
-  // ---------- Palette ----------
+  // ---------- Palette: Lumen keeps her teal colours (the visitor's colour picker is gone) ----------
   let palette = 0;
   const palCur = { bell: new THREE.Color(PALETTES[0].bell), sub: new THREE.Color(PALETTES[0].sub), halo: new THREE.Color(PALETTES[0].halo) };
-  document.querySelectorAll('.sw').forEach((b) => b.addEventListener('click', () => {
-    palette = +b.dataset.p;
-    document.querySelectorAll('.sw').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
-    snd('chord', palette / 4);
-  }));
 
   // ---------- Pointer and hold-to-dive ----------
   const ndc = new THREE.Vector2(0, 0);
@@ -2733,7 +2735,6 @@ function createSound(ctx, out) {
     labelEl.style.opacity = live ? smooth(1.3, 1.8, u).toFixed(3) : 0;
     pill.style.opacity = live ? introE.toFixed(3) : 0;
     rulerEl.style.opacity = live ? introE.toFixed(3) : 0;
-    paletteEl.style.opacity = live ? introE.toFixed(3) : 0;
     soundBtn.style.opacity = live ? introE.toFixed(3) : 0;
     rulerMark.style.top = `${(1 - clamp01((u - 1) / (segs - 1))) * 100}%`;
     finder.querySelectorAll('button').forEach((b) => b.classList.toggle('is-on', b.dataset.go !== 'contact' && Math.abs(+b.dataset.go - u) < 0.5));
