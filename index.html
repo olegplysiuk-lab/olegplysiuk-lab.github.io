@@ -282,6 +282,16 @@ button { font: inherit; color: inherit; }
   padding-left: var(--gl); padding-right: var(--gr);
   background: radial-gradient(120% 90% at 50% 110%, #0d3a40 0%, #061113 60%);
 }
+.gate { align-content: safe center; overflow-y: auto; padding-top: 24px; padding-bottom: 24px; }
+/* who is behind it, before anything else: Medusa Lab is one creator, and why the guide is a medusa */
+.gate__intro { display: grid; justify-items: center; gap: 10px; max-width: 640px; text-align: center; }
+.gate__intro p { margin: 0; }
+.gate__brand { font: 700 clamp(1.7rem, 4.4vw, 3.1rem)/1 var(--display); letter-spacing: -0.03em; background: linear-gradient(90deg, #bff4f6, #3fc7d2 45%, #ff9ab5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.gate__who { font: 500 11px/1.5 var(--mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+.gate__lead { max-width: 44ch; font-size: clamp(0.98rem, 1.5vw, 1.12rem); line-height: 1.55; }
+.gate__why { margin: 0; max-width: 50ch; text-align: center; font-size: 0.9rem; line-height: 1.55; color: var(--muted); }
+.gate__why b { font-weight: 500; color: var(--fg); }
+@media (max-height: 720px) { .gate { gap: 18px; } .gate__lead { font-size: 0.94rem; } .gate__why { font-size: 0.84rem; } }
 .gate__row { display: flex; align-items: center; gap: clamp(10px, 2vw, 22px); width: min(980px, 100%); }
 .gate__word { font: 800 clamp(2rem, 7vw, 5.6rem)/1 var(--display); letter-spacing: -0.04em; text-transform: uppercase; white-space: nowrap; }
 .gate__track { position: relative; flex: 1; min-width: 0; height: clamp(44px, 7vw, 76px); border: 2px solid var(--fg); border-radius: 999px; }
@@ -364,7 +374,7 @@ button { font: inherit; color: inherit; }
 .welcome__w { display: inline-block; }
 .welcome__ch { display: inline-block; opacity: 0; transform: translateY(0.35em); filter: blur(14px); text-shadow: 0 0 28px rgb(63 199 210 / 0.35); transition: opacity 1s, transform 1.4s cubic-bezier(0.2, 0.7, 0.2, 1), filter 1.4s; transition-delay: calc(var(--i) * 55ms); }
 .welcome.is-on .welcome__ch { opacity: 1; transform: none; filter: blur(0); }
-.hero { position: fixed; z-index: 4; left: var(--gl); bottom: calc(var(--bottom) + 58px); max-width: 30ch; pointer-events: none; }
+.hero { position: fixed; z-index: 4; left: var(--gl); bottom: calc(var(--bottom) + 58px); max-width: 36ch; pointer-events: none; }
 .kicker { margin: 0 0 10px; font: 500 11px/1.4 var(--mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); }
 .role { margin: 0; font-size: 0.98rem; line-height: 1.45; text-shadow: 0 1px 14px rgb(0 0 0 / 0.5); }
 .hold {
@@ -542,7 +552,7 @@ html.lb-open, html.lb-open body { overflow: hidden; }
 <span class="corner corner--tl"></span><span class="corner corner--tr"></span>
 <span class="corner corner--bl"></span><span class="corner corner--br"></span>
 
-<div class="hud hud--tl"><span class="brand">Oleh Plysiuk</span><br>AI video · camera · edit</div>
+<div class="hud hud--tl"><span class="brand">Medusa Lab</span><br>Oleh Plysiuk · AI video</div>
 <div class="hud hud--tr"><span class="dot"></span><span id="tc">00:00:00:00</span><br><span id="depth">Depth 700 m · f/16</span></div>
 <div class="hud hud--bc fade" id="scene-label" style="opacity:0">Lumen · rising</div>
 
@@ -560,8 +570,8 @@ html.lb-open, html.lb-open body { overflow: hidden; }
 <div class="hero fade">
   <h1 class="sr-only">Oleh Plysiuk, AI video creator and videographer in Warsaw</h1>
   <p class="sr-only">Welcome to my world</p>
-  <p class="kicker">AI Video Creator · Warsaw</p>
-  <p class="role">Videographer and video editor. Real camera work and generative AI, cut into one story.</p>
+  <p class="kicker">Medusa Lab · AI video creator · Warsaw</p>
+  <p class="role">I’m Oleh Plysiuk. One person, not an agency: every film here I made myself, from the idea and the camera to the AI scenes, the edit and the sound.</p>
 </div>
 
 <div class="hold fade">
@@ -653,14 +663,20 @@ html.lb-open, html.lb-open body { overflow: hidden; }
 </main>
 
 <div class="gate" id="gate">
+  <div class="gate__intro">
+    <p class="gate__brand">Medusa Lab</p>
+    <p class="gate__who">Oleh Plysiuk · AI video creator · Warsaw</p>
+    <p class="gate__lead">One creator, not an agency. Every film here is my own work: the idea, the camera, the AI scenes, the edit and the sound.</p>
+  </div>
   <div class="gate__row" id="gate-load">
     <span class="gate__word">Loading</span>
     <span class="gate__track"><span class="gate__ball" id="gate-ball"></span></span>
     <span class="gate__pct" id="gate-pct">0%</span>
   </div>
   <button class="gate__dive" type="button" id="dive" hidden><span>Dive</span><span class="gate__orb">Sound on</span><span>in →</span></button>
+  <p class="gate__why"><b>Why a medusa?</b> In the deep sea it makes its own light. In the myth, one look stops you still. That is what my videos are made for.</p>
   <div class="gate__note">
-    <span>Lumen comes with sound. Headphones recommended.</span>
+    <span>Lumen, my medusa, comes with sound. Headphones recommended.</span>
     <button class="gate__quiet" type="button" id="dive-quiet" hidden>Enter without sound</button>
   </div>
 </div>
