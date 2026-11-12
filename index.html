@@ -409,6 +409,77 @@ button { font: inherit; color: inherit; }
 .me__status { display: inline-flex; align-items: center; gap: 8px; margin-top: 9px !important; font: 500 10px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: #7ee2a8; }
 .me__status i { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: ping 2.2s ease-out infinite; }
 @keyframes ping { 0% { box-shadow: 0 0 0 0 rgb(74 222 128 / 0.55); } 70%, 100% { box-shadow: 0 0 0 8px rgb(74 222 128 / 0); } }
+/* the card opens About; it lifts on hover */
+a.me { position: relative; color: inherit; text-decoration: none; cursor: pointer; transition: border-color 0.25s, transform 0.25s; }
+a.me:focus-visible { border-color: rgb(242 162 60 / 0.55); transform: translateY(-2px); }
+@media (hover: hover) { a.me:hover { border-color: rgb(242 162 60 / 0.55); transform: translateY(-2px); } a.me:hover .me__more { background: var(--accent); color: var(--accent-ink); transform: rotate(45deg); } }
+.me__name { padding-right: 34px; }
+.me__more { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid rgb(242 162 60 / 0.5); border-radius: 50%; color: var(--accent); font: 600 14px/1 var(--body); transition: background 0.25s, color 0.25s, transform 0.25s; }
+a.me:focus-visible .me__more { background: var(--accent); color: var(--accent-ink); transform: rotate(45deg); }
+/* Above the card: a small growth chart that draws itself, the platforms, and a way to send a brief */
+.grow { margin-bottom: 12px; padding: 14px 16px 12px; border: 1px solid var(--line); border-radius: 18px; background: rgb(6 20 22 / 0.66); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 20px 44px -22px rgb(0 0 0 / 0.9), inset 0 0 0 1px rgb(63 199 210 / 0.06); }
+.grow p { margin: 0; }
+.grow__kicker { display: flex; align-items: center; gap: 8px; font: 500 10px/1 var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: #7ee2a8; }
+.grow__kicker b { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 6px; background: rgb(74 222 128 / 0.15); color: #4ade80; font: 700 12px/1 var(--body); }
+.grow.is-on .grow__kicker b { animation: nudge 2.4s 2s ease-in-out infinite; }
+@keyframes nudge { 0%, 70%, 100% { transform: none; } 80% { transform: translate(2px, -2px); } }
+.grow__title { margin-top: 8px !important; font: 600 0.98rem/1.3 var(--display); letter-spacing: -0.01em; }
+.grow__short { display: none; }
+.grow__chart { display: block; width: 100%; height: auto; margin: 8px 0 4px; overflow: visible; }
+.grow__chart .bar { transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0); }
+.grow.is-on .bar { animation: bar-up 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; animation-delay: calc(var(--i) * 90ms); }
+@keyframes bar-up { to { transform: scaleY(1); } }
+.grow__chart .line { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.grow.is-on .line { animation: draw 1.5s 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards, glow 3.2s 2.2s ease-in-out infinite; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes glow { 50% { stroke-width: 3.8; } }
+.grow__chart .pop { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(0); opacity: 0; }
+.grow.is-on .pop { animation: pop 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) forwards; animation-delay: var(--d); }
+@keyframes pop { to { transform: scale(1); opacity: 1; } }
+.grow.is-on .bob { animation: bob 3s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes bob { 50% { transform: translateY(-3px); } }
+.grow__foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.grow__tags { font: 500 10px/1.3 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.grow__cta { flex: none; padding: 9px 14px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 22px rgb(242 162 60 / 0.4); transition: transform 0.2s, box-shadow 0.2s; }
+.grow__cta:hover, .grow__cta:focus-visible { transform: scale(1.05); box-shadow: 0 0 30px rgb(242 162 60 / 0.65); }
+/* Send a brief: a form over the page; it reaches Oleh by email */
+.brief { position: fixed; inset: 0; z-index: 41; display: grid; padding: var(--top) var(--gr) var(--bottom) var(--gl); overflow-y: auto; overscroll-behavior: contain; background: rgb(4 10 11 / 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.brief__box { position: relative; width: min(660px, 100%); margin: auto; padding: 28px 28px 24px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(180deg, rgb(13 46 51 / 0.96), rgb(6 17 19 / 0.97)); box-shadow: 0 40px 90px -30px #000; }
+.brief__title { margin: 0; font: 700 clamp(1.3rem, 3vw, 1.9rem)/1.1 var(--display); letter-spacing: -0.02em; text-transform: uppercase; }
+.brief__lead { margin: 8px 0 20px; color: var(--muted); font-size: 0.95rem; }
+.brief__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.brief label, .brief legend { display: grid; gap: 6px; font: 500 10px/1.2 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.brief input:not([type="checkbox"]), .brief textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: rgb(255 255 255 / 0.04); color: var(--fg); font: 400 16px/1.4 var(--body); letter-spacing: 0; text-transform: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.brief textarea { min-height: 112px; resize: vertical; }
+.brief input:focus, .brief textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgb(242 162 60 / 0.18); }
+.brief ::placeholder { color: rgb(163 185 182 / 0.55); }
+.brief__need { margin: 18px 0; padding: 0; border: 0; }
+.brief__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.brief__chips label { display: block; }
+.brief__chips input { position: absolute; opacity: 0; pointer-events: none; }
+.brief__chips span { display: inline-block; padding: 8px 13px; border: 1px solid var(--line); border-radius: 999px; font: 400 13px/1.2 var(--body); letter-spacing: 0; text-transform: none; color: var(--fg); cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s; }
+.brief__chips input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.brief__chips input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.brief__row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.brief__ok { display: flex !important; grid-template-columns: none; align-items: flex-start; gap: 10px !important; margin-top: 16px; font: 400 13px/1.45 var(--body) !important; letter-spacing: 0 !important; text-transform: none !important; }
+.brief__ok input { margin-top: 2px; width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
+.brief__more { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.brief__privacy { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: rgb(255 255 255 / 0.04); color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.brief__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 20px; }
+.brief__send { padding: 14px 24px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font: 500 12px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; box-shadow: 0 0 26px rgb(242 162 60 / 0.4); }
+.brief__send[disabled] { opacity: 0.6; cursor: wait; }
+.brief__msg { font-size: 0.9rem; color: var(--muted); }
+.brief__msg.is-err { color: #ff9d8f; }
+.brief__msg a { color: var(--accent); }
+.brief__x { position: absolute; top: 12px; right: 12px; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: rgb(6 17 19 / 0.6); color: var(--fg); font: 400 22px/1 var(--body); cursor: pointer; }
+.brief__x:hover { border-color: var(--accent); color: var(--accent); }
+.brief__hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.brief__done { display: grid; justify-items: center; gap: 10px; padding: 30px 8px 10px; text-align: center; }
+.brief__done b { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: rgb(74 222 128 / 0.15); color: #4ade80; font: 700 30px/1 var(--body); }
+.brief__done p { margin: 0; max-width: 40ch; color: var(--muted); }
+.brief__done h2 { margin: 0; font: 700 1.5rem/1.1 var(--display); text-transform: uppercase; }
+.links button { padding: 10px 18px; border: 1px solid var(--accent); border-radius: 999px; background: var(--accent); color: var(--accent-ink); font: inherit; cursor: pointer; }
+.links button:hover { box-shadow: 0 0 24px rgb(242 162 60 / 0.5); }
 
 /* Labels pinned under each tab */
 .labels { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
@@ -519,6 +590,17 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   .me { gap: 12px; padding: 10px 14px 10px 10px; }
   .me__photo { width: 62px; }
   .me .role { font-size: 0.82rem; }
+  /* phones: the growth block is one slim row above the card */
+  .grow { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 6px 6px 6px 10px; border-radius: 14px; }
+  .grow__head { flex: 1; min-width: 0; }
+  .grow__kicker, .grow__title, .grow__tags { display: none; }
+  .grow__short { display: block; font: 600 0.74rem/1.2 var(--display); }
+  .grow__chart { order: -1; flex: none; width: 62px; margin: 0; }
+  .grow__cta { padding: 9px 12px; font-size: 10px; }
+  .grow__chart .pop { display: none; }
+  .grow__foot { flex: none; }
+  .brief__grid, .brief__row { grid-template-columns: minmax(0, 1fr); }
+  .brief__box { padding: 24px 18px 20px; }
   .hud--bc { bottom: calc(var(--bottom) + 52px); }
 }
 @media (max-width: 700px) {
@@ -543,6 +625,9 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   .about__photo img { transform: none; filter: none; transition: none; }
   .about__light { animation: none; }
   .me__status i { animation: none; }
+  .grow .bar, .grow .pop { animation: none !important; transform: none; opacity: 1; }
+  .grow .line { animation: none !important; stroke-dashoffset: 0; }
+  .grow .bob, .grow__kicker b { animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .welcome__ch { transition: opacity 0.6s; transform: none; filter: none; }
@@ -578,7 +663,47 @@ html.lb-open, html.lb-open body { overflow: hidden; }
 <div class="hero me-card fade">
   <h1 class="sr-only">Oleh Plysiuk, AI video creator and videographer in Warsaw</h1>
   <p class="sr-only">Welcome to my world</p>
-  <div class="me">
+  <div class="grow" id="grow">
+    <div class="grow__head">
+      <p class="grow__kicker"><b aria-hidden="true">↗</b>Grow with video</p>
+      <p class="grow__title">Want more people to see, remember and buy your product?</p>
+      <p class="grow__short">Grow your sales with video</p>
+    </div>
+    <svg class="grow__chart" viewBox="0 0 360 106" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="g-bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3fc7d2" stop-opacity="0.85"/><stop offset="1" stop-color="#3fc7d2" stop-opacity="0.12"/></linearGradient>
+        <linearGradient id="g-top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2a23c"/><stop offset="1" stop-color="#f2a23c" stop-opacity="0.15"/></linearGradient>
+        <linearGradient id="g-ig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#feda75"/><stop offset="0.5" stop-color="#d62976"/><stop offset="1" stop-color="#4f5bd5"/></linearGradient>
+      </defs>
+      <g stroke="rgb(238 244 242 / 0.08)" stroke-width="1"><line x1="0" y1="40" x2="360" y2="40"/><line x1="0" y1="60" x2="360" y2="60"/><line x1="0" y1="80" x2="360" y2="80"/><line x1="0" y1="100" x2="360" y2="100" stroke="rgb(238 244 242 / 0.2)"/></g>
+      <g fill="url(#g-bar)">
+        <rect class="bar" style="--i:0" x="14" y="84" width="26" height="16" rx="4"/>
+        <rect class="bar" style="--i:1" x="64" y="78" width="26" height="22" rx="4"/>
+        <rect class="bar" style="--i:2" x="114" y="70" width="26" height="30" rx="4"/>
+        <rect class="bar" style="--i:3" x="164" y="64" width="26" height="36" rx="4"/>
+        <rect class="bar" style="--i:4" x="214" y="52" width="26" height="48" rx="4"/>
+        <rect class="bar" style="--i:5" x="264" y="42" width="26" height="58" rx="4"/>
+        <rect class="bar" style="--i:6" x="314" y="28" width="26" height="72" rx="4" fill="url(#g-top)"/>
+      </g>
+      <polyline class="line" pathLength="1" points="27,78 77,72 127,64 177,58 227,46 277,36 327,22" fill="none" stroke="#f2a23c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 5px rgb(242 162 60 / 0.6))"/>
+      <g transform="translate(327 22) rotate(-15.6)"><path class="pop" style="--d:1.75s" d="M13 0 L0 -6.5 L0 6.5Z" fill="#f2a23c"/></g>
+      <g transform="translate(77 52)"><g class="pop" style="--d:0.9s"><g class="bob" style="--d:2.2s">
+        <circle r="11" fill="url(#g-ig)"/><rect x="-5.5" y="-5.5" width="11" height="11" rx="3.4" fill="none" stroke="#fff" stroke-width="1.5"/><circle r="2.6" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="3.2" cy="-3.2" r="0.85" fill="#fff"/>
+      </g></g></g>
+      <g transform="translate(177 38)"><g class="pop" style="--d:1.2s"><g class="bob" style="--d:2.6s">
+        <circle r="11" fill="#111" stroke="rgb(255 255 255 / 0.25)"/>
+        <g fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M0.6 -6.6 v8.4 a2.7 2.7 0 1 1 -2.7 -2.7 M0.6 -6.6 q1 2.6 4 2.9" stroke="#25f4ee" transform="translate(-0.7 -0.4)"/><path d="M0.6 -6.6 v8.4 a2.7 2.7 0 1 1 -2.7 -2.7 M0.6 -6.6 q1 2.6 4 2.9" stroke="#fe2c55" transform="translate(0.7 0.4)"/><path d="M0.6 -6.6 v8.4 a2.7 2.7 0 1 1 -2.7 -2.7 M0.6 -6.6 q1 2.6 4 2.9" stroke="#fff"/></g>
+      </g></g></g>
+      <g transform="translate(277 16)"><g class="pop" style="--d:1.5s"><g class="bob" style="--d:3s">
+        <circle r="11" fill="#ff0033"/><rect x="-6" y="-4.2" width="12" height="8.4" rx="2.6" fill="#fff"/><path d="M-1.6 -2.3 L2.6 0 L-1.6 2.3Z" fill="#ff0033"/>
+      </g></g></g>
+    </svg>
+    <div class="grow__foot">
+      <p class="grow__tags">Reels · ads · brand films</p>
+      <button class="grow__cta" type="button" data-brief>Send a brief →</button>
+    </div>
+  </div>
+  <a class="me" href="#about">
     <picture class="me__photo">
       <source srcset="media/oleh-sm.webp" type="image/webp">
       <img src="media/oleh-sm.jpg" alt="Oleh Plysiuk with his camera" width="240" height="300" decoding="async">
@@ -588,8 +713,9 @@ html.lb-open, html.lb-open body { overflow: hidden; }
       <p class="kicker">AI video creator · Warsaw</p>
       <p class="role">Independent creator. Every film here is my own work: idea, camera, AI scenes, edit and sound.</p>
       <p class="me__status"><i aria-hidden="true"></i>Available for projects</p>
+      <span class="me__more" title="About me"><span class="sr-only">About me</span><span aria-hidden="true">↗</span></span>
     </div>
-  </div>
+  </a>
 </div>
 
 <div class="hold fade">
@@ -619,7 +745,7 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   <div class="track" aria-label="Selected work: showreel, night street fashion film, two chair films, sport commercial, and eleven reels"></div>
   <section class="contact" aria-label="About and contact">
     <div class="marquee" aria-hidden="true"><span>Let’s make the video</span><span>Let’s make the video</span><span>Let’s make the video</span><span>Let’s make the video</span></div>
-    <div class="about">
+    <div class="about" id="about">
       <figure class="about__photo">
         <picture>
           <source srcset="media/oleh.webp" type="image/webp">
@@ -660,6 +786,7 @@ html.lb-open, html.lb-open body { overflow: hidden; }
         <span class="mail">olegplysiuk@gmail.com</span>
       </div>
       <ul class="links">
+        <li><button type="button" data-brief>Send a brief ✎</button></li>
         <li><a href="cv/Oleh_Plysiuk_CV.pdf" download hreflang="en">Download CV · EN ↓</a></li>
         <li><a href="cv/Oleh_Plysiuk_CV_PL.pdf" download hreflang="pl" lang="pl">Pobierz CV · PL ↓</a></li>
         <li><a href="https://www.behance.net/fc6d06c6" target="_blank" rel="noopener">Behance ↗</a></li>
@@ -701,6 +828,53 @@ html.lb-open, html.lb-open body { overflow: hidden; }
   <div class="lb__row">
     <a class="lb__link" target="_blank" rel="noopener" hidden>Watch in original quality on YouTube ↗</a>
     <button type="button" id="lb-close">Close</button>
+  </div>
+</div>
+
+<div class="brief" id="brief" hidden role="dialog" aria-modal="true" aria-labelledby="brief-title">
+  <div class="brief__box">
+    <button class="brief__x" type="button" id="brief-x" aria-label="Close">×</button>
+    <form id="brief-form" novalidate>
+      <p class="kicker">Send a brief</p>
+      <h2 class="brief__title" id="brief-title">Tell me about your project</h2>
+      <p class="brief__lead">A few lines are enough. I will reply by email.</p>
+      <div class="brief__grid">
+        <label>Your name *<input name="name" required autocomplete="name"></label>
+        <label>Company or brand<input name="company" autocomplete="organization"></label>
+        <label>Email *<input name="email" type="email" required autocomplete="email"></label>
+        <label>Phone or messenger<input name="phone" autocomplete="tel"></label>
+      </div>
+      <fieldset class="brief__need">
+        <legend>What do you need?</legend>
+        <div class="brief__chips">
+          <label><input type="checkbox" name="need" value="Product ad"><span>Product ad</span></label>
+          <label><input type="checkbox" name="need" value="Reels / TikTok"><span>Reels / TikTok</span></label>
+          <label><input type="checkbox" name="need" value="Brand film"><span>Brand film</span></label>
+          <label><input type="checkbox" name="need" value="AI character"><span>AI character</span></label>
+          <label><input type="checkbox" name="need" value="Agency project"><span>Agency project</span></label>
+          <label><input type="checkbox" name="need" value="Website like this one"><span>Website like this one</span></label>
+          <label><input type="checkbox" name="need" value="Other"><span>Other</span></label>
+        </div>
+      </fieldset>
+      <label>About the project *<textarea name="message" required placeholder="Your product, the goal, where the video will run…"></textarea></label>
+      <div class="brief__row">
+        <label>Deadline<input name="deadline" placeholder="e.g. end of March"></label>
+        <label>Language<input name="language" placeholder="EN · PL · UA"></label>
+      </div>
+      <input class="brief__hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="brief__ok"><input type="checkbox" name="consent" required><span>I agree that Oleh Plysiuk uses these details to reply to my inquiry. <button class="brief__more" type="button" aria-expanded="false" aria-controls="brief-privacy">How my data is used</button></span></label>
+      <p class="brief__privacy" id="brief-privacy" hidden>Who receives it: Oleh Plysiuk, Warsaw, Poland. Why: to reply to your inquiry and prepare an offer (GDPR, Art. 6(1)(b) and (f)). How: the form is delivered to my email by FormSubmit (formsubmit.co). How long: while we talk about the project, and no longer than 12 months if we do not work together. Your rights: you can ask me to show, correct or delete your data, and you can complain to the Polish data protection authority (UODO). Just write to me.</p>
+      <div class="brief__actions">
+        <button class="brief__send" type="submit">Send the brief</button>
+        <span class="brief__msg" id="brief-msg" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+    <div class="brief__done" id="brief-done" hidden>
+      <b aria-hidden="true">✓</b>
+      <h2>Thank you!</h2>
+      <p>Your brief is on its way to me. I will read it and get back to you by email.</p>
+      <button class="brief__send" type="button" id="brief-ok">Back to the films</button>
+    </div>
   </div>
 </div>
 
@@ -1044,6 +1218,10 @@ function createSound(ctx, out) {
   track.style.height = `${segs * 100}vh`;
   const contact = document.querySelector('.contact');
   const heroEl = document.querySelector('.hero');
+  // the creator card and the growth block take clicks only while the first screen shows them
+  const growEl = document.getElementById('grow'), meCard = document.querySelector('a.me');
+  const heroFocus = [...heroEl.querySelectorAll('a, button')];
+  let heroLive = null;
   const holdEl = document.querySelector('.hold');
   holdEl.style.pointerEvents = 'none';
   const swipeHint = document.querySelector('.swipe-hint');
@@ -2068,7 +2246,9 @@ function createSound(ctx, out) {
   }
   const scrollForKf = (k) => ((k - 1) / (segs - 1)) * (track.offsetHeight - innerHeight);
   function goTo(target) {
-    const top = target === 'contact' ? contact.offsetTop : scrollForKf(+target);
+    const top = target === 'contact' ? contact.offsetTop
+      : target === 'about' ? contact.offsetTop + aboutEl.offsetTop - 24
+      : scrollForKf(+target);
     if (touchUI) glideTo(top);
     else window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
   }
@@ -2334,6 +2514,81 @@ function createSound(ctx, out) {
   document.getElementById('lb-close').addEventListener('click', closeLightbox);
   lb.addEventListener('click', (e) => { if (e.target === lb) closeLightbox(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !lb.hidden) closeLightbox(); });
+  // ---------- The creator card opens About; Send a brief opens the form ----------
+  meCard.addEventListener('click', (e) => { e.preventDefault(); snd('click'); goTo('about'); });
+  meCard.addEventListener('pointerenter', () => snd('tick', 1));
+  // The form reaches Oleh by email through FormSubmit (the build puts the address in; it comes from the CV).
+  // If it cannot be sent from here, the visitor gets the same text in their own mail app.
+  const FORM_TO = 'https://formsubmit.co/ajax/olegplysiuk@gmail.com';
+  const brief = document.getElementById('brief'), briefForm = document.getElementById('brief-form');
+  const briefMsg = document.getElementById('brief-msg'), briefDone = document.getElementById('brief-done');
+  const briefSend = briefForm.querySelector('.brief__send'), briefMore = briefForm.querySelector('.brief__more');
+  const briefPrivacy = document.getElementById('brief-privacy');
+  let briefBack = null;
+  function openBrief() {
+    if (!lb.hidden) closeLightbox();
+    briefBack = document.activeElement;
+    brief.hidden = false; briefForm.hidden = false; briefDone.hidden = true;
+    briefMsg.textContent = ''; briefMsg.classList.remove('is-err');
+    document.documentElement.classList.add('lb-open'); // the page underneath stays put
+    snd('click');
+    setTimeout(() => briefForm.querySelector('[name="name"]').focus(), 60);
+  }
+  function closeBrief() {
+    if (brief.hidden) return;
+    brief.hidden = true;
+    document.documentElement.classList.remove('lb-open');
+    if (briefBack && briefBack.focus) briefBack.focus();
+  }
+  document.querySelectorAll('[data-brief]').forEach((b) => {
+    b.addEventListener('click', (e) => { e.preventDefault(); openBrief(); });
+    b.addEventListener('pointerenter', () => snd('tick', 1));
+  });
+  document.getElementById('brief-x').addEventListener('click', closeBrief);
+  document.getElementById('brief-ok').addEventListener('click', closeBrief);
+  brief.addEventListener('click', (e) => { if (e.target === brief) closeBrief(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !brief.hidden) closeBrief(); });
+  briefMore.addEventListener('click', () => {
+    briefPrivacy.hidden = !briefPrivacy.hidden;
+    briefMore.setAttribute('aria-expanded', String(!briefPrivacy.hidden));
+  });
+  function briefSent() {
+    briefForm.reset(); briefForm.hidden = true; briefDone.hidden = false;
+    document.getElementById('brief-ok').focus();
+    snd('chord', 0);
+  }
+  briefForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!briefForm.reportValidity()) return;
+    const f = new FormData(briefForm);
+    if (f.get('_honey')) { briefSent(); return; } // a bot filled the hidden field
+    const subject = `New brief from ${f.get('name')}${f.get('company') ? ' · ' + f.get('company') : ''}`;
+    const data = {
+      name: f.get('name'), company: f.get('company'), email: f.get('email'), phone: f.get('phone'),
+      needs: f.getAll('need').join(', '), message: f.get('message'), deadline: f.get('deadline'), language: f.get('language'),
+      _subject: subject, _replyto: f.get('email'), _template: 'table', _captcha: 'false',
+    };
+    briefSend.disabled = true; briefMsg.classList.remove('is-err'); briefMsg.textContent = 'Sending…';
+    try {
+      if (!/^https:\/\//.test(FORM_TO)) throw new Error('no form service in this build');
+      const r = await fetch(FORM_TO, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !(j.success === true || j.success === 'true')) throw new Error(j.message || `HTTP ${r.status}`);
+      briefMsg.textContent = '';
+      briefSent();
+    } catch (err) {
+      const text = [['Name', data.name], ['Company', data.company], ['Email', data.email], ['Phone', data.phone], ['Needs', data.needs],
+        ['Deadline', data.deadline], ['Language', data.language], ['', ''], ['Project', data.message]]
+        .filter(([k, v]) => !k || v).map(([k, v]) => (k ? `${k}: ${v}` : '')).join('\n');
+      const to = (document.querySelector('.mail') || { textContent: '' }).textContent.trim();
+      const a = document.createElement('a');
+      a.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+      a.textContent = 'send it by email instead';
+      briefMsg.classList.add('is-err');
+      briefMsg.replaceChildren('Could not send it from here: ', a, '.');
+    } finally { briefSend.disabled = false; }
+  });
+
   const aboutEl = document.querySelector('.about');
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { aboutEl.classList.add('is-in'); io.disconnect(); } }, { threshold: 0.25 });
@@ -2718,6 +2973,13 @@ function createSound(ctx, out) {
     // UI visibility
     const live = gatePhase === 'gone' || gatePhase === 'exit';
     heroEl.style.opacity = live ? (heroAmt * introE).toFixed(3) : 0;
+    const heroOn = live && heroAmt * introE > 0.5;
+    if (heroOn !== heroLive) {
+      heroLive = heroOn;
+      [growEl, meCard].forEach((el) => { el.style.pointerEvents = heroOn ? 'auto' : 'none'; });
+      heroFocus.forEach((el) => { el.tabIndex = heroOn ? 0 : -1; });
+      if (heroOn) growEl.classList.add('is-on'); // the chart draws itself the first time it is seen
+    }
     if (live && introE > 0.12 && !welcomeEl.classList.contains('is-on')) welcomeEl.classList.add('is-on');
     welcomeEl.style.opacity = heroAmt.toFixed(3);
     holdEl.style.opacity = live ? (heroAmt * introE * (holdDone ? 0 : 1)).toFixed(3) : 0;
